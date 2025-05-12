@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Top Rankings | Citation Network Analysis Tool</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/nouislider@15.7.1/dist/nouislider.min.css">
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+        <div class="container-fluid">
+            <a class="navbar-brand" href="#">📚 Citation Network Analysis</a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav">
+                    <li class="nav-item">
+                        <a class="nav-link" href="index.html">Network Visualization</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link active" href="rankings.html">Top Rankings</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container-fluid">
+        <div class="row mt-3">
+            <div class="col-md-12">
+                <div class="card">
+                    <div class="card-body">
+                        <h2 class="card-title">Top Rankings by Subfield</h2>
+                        <p class="card-text">
+                            This page shows the top papers and authors in each subfield of the citation network.
+                            Use the filters to explore different subfields and time periods.
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="row mt-3" id="noDataAlert">
+            <div class="col-md-12">
+                <div class="alert alert-warning">
+                    <h4 class="alert-heading">No Data Available</h4>
+                    <p>Please upload a network file on the main page first.</p>
+                    <hr>
+                    <p class="mb-0">
+                        <a href="index.html" class="btn btn-primary">Go to Upload Page</a>
+                    </p>
+                </div>
+            </div>
+        </div>
+
+        <div id="rankingsContent" style="display: none;">
+            <div class="row mt-3">
+                <div class="col-md-12">
+                    <div class="card">
+                        <div class="card-header">
+                            <h5>Filters</h5>
+                        </div>
+                        <div class="card-body">
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="mb-3">
+                                        <label for="subfieldSelect" class="form-label">Select Subfield</label>
+                                        <select class="form-select" id="subfieldSelect">
+                                            <!-- Options will be filled dynamically -->
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="mb-3">
+                                        <label for="yearRangeSlider" class="form-label">Year Range</label>
+                                        <div id="yearRangeSlider"></div>
+                                        <div class="d-flex justify-content-between mt-2">
+                                            <span id="rankingYearMin"></span>
+                                            <span id="rankingYearMax"></span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="row mt-3">
+                <div class="col-md-6">
+                    <div class="card">
+                        <div class="card-header">
+                            <h5 id="topPapersTitle">Top 10 Papers</h5>
+                        </div>
+                        <div class="card-body">
+                            <div class="table-responsive">
+                                <table class="table table-striped table-hover" id="topPapersTable">
+                                    <thead>
+                                        <tr>
+                                            <th>Title</th>
+                                            <th>Authors</th>
+                                            <th>Year</th>
+                                            <th>Citations</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <!-- Will be filled dynamically -->
+                                    </tbody>
+                                </table>
+                            </div>
+                            <div id="topPapersChart" style="height: 400px;"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-md-6">
+                    <div class="card">
+                        <div class="card-header">
+                            <h5 id="topAuthorsTitle">Top 10 Authors</h5>
+                        </div>
+                        <div class="card-body">
+                            <div class="table-responsive">
+                                <table class="table table-striped table-hover" id="topAuthorsTable">
+                                    <thead>
+                                        <tr>
+                                            <th>Author</th>
+                                            <th>Papers</th>
+                                            <th>Citations</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <!-- Will be filled dynamically -->
+                                    </tbody>
+                                </table>
+                            </div>
+                            <div id="topAuthorsChart" style="height: 400px;"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="row mt-3">
+                <div class="col-md-12">
+                    <div class="card">
+                        <div class="card-header">
+                            <h5 id="publicationTrendTitle">Publication Trend</h5>
+                        </div>
+                        <div class="card-body">
+                            <div id="publicationTrendChart" style="height: 400px;"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <footer class="footer mt-5 py-3 bg-light">
+        <div class="container text-center">
+            <span class="text-muted">Created with ❤️ for citation network analysis</span>
+        </div>
+    </footer>
+
+    <!-- Load required libraries -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/nouislider@15.7.1/dist/nouislider.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/plotly.js@2.20.0/dist/plotly.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/graphology@0.25.1/dist/graphology.umd.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/graphology-gexf@0.13.0/dist/graphology-gexf.umd.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/graphology-graphml@0.5.1/dist/graphology-graphml.umd.min.js"></script>
+    
+    <!-- Load application scripts -->
+    <script src="js/static-data.js"></script>
+    <script src="js/rankings-static.js"></script>
+</body>
+</html>

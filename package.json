@@ -1,0 +1,23 @@
+{
+  "name": "workspace",
+  "version": "1.0.0",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "description": "",
+  "dependencies": {
+    "cors": "^2.8.5",
+    "express": "^5.1.0",
+    "graphology": "^0.26.0",
+    "graphology-gexf": "^0.13.2",
+    "graphology-graphml": "^0.5.2",
+    "graphology-layout-force": "^0.2.4",
+    "http-server": "^14.1.1",
+    "nodemon": "^3.1.10",
+    "sigma": "^3.0.1"
+  }
+}

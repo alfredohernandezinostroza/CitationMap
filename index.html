@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Citation Network Analysis Tool</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/nouislider@15.7.1/dist/nouislider.min.css">
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+        <div class="container-fluid">
+            <a class="navbar-brand" href="#">📚 Citation Network Analysis</a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav">
+                    <li class="nav-item">
+                        <a class="nav-link active" href="index.html">Network Visualization</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="rankings.html">Top Rankings</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container-fluid">
+        <div class="row mt-3">
+            <div class="col-md-12">
+                <div class="card">
+                    <div class="card-body">
+                        <h2 class="card-title">Citation Network Analysis Tool</h2>
+                        <p class="card-text">
+                            This tool allows you to analyze citation networks by uploading a network file (GEXF or GraphML).
+                            You can visualize the network interactively, explore paper metadata, filter by various criteria,
+                            and view top papers and authors by subfield.
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="row mt-3">
+            <div class="col-md-12">
+                <div class="card">
+                    <div class="card-body">
+                        <h4>Upload Network File</h4>
+                        <div class="mb-3">
+                            <label for="fileInput" class="form-label">Select a GEXF or GraphML file</label>
+                            <input class="form-control" type="file" id="fileInput" accept=".gexf,.graphml,.xml">
+                        </div>
+                        <button class="btn btn-primary" id="uploadBtn">Upload and Analyze</button>
+                        <div class="alert alert-danger mt-3 d-none" id="errorAlert"></div>
+                        <div class="alert alert-success mt-3 d-none" id="successAlert"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="row mt-3" id="noGraphContent">
+            <div class="col-md-12">
+                <div class="card">
+                    <div class="card-body">
+                        <h4>How to use this tool</h4>
+                        <ol>
+                            <li><strong>Upload a network file</strong> (GEXF, GraphML, or XML) using the file uploader above</li>
+                            <li><strong>Explore the network visualization</strong> by zooming, panning, and clicking on nodes</li>
+                            <li><strong>Filter the network</strong> by cluster, year, or author</li>
+                            <li><strong>View paper details</strong> for each node in the network</li>
+                            <li><strong>Navigate to the Top Rankings page</strong> to see top papers and authors by subfield</li>
+                        </ol>
+                        <h5>About network file formats</h5>
+                        <ul>
+                            <li><strong>GEXF</strong> (Graph Exchange XML Format) is an XML-based format for describing network structures.</li>
+                            <li><strong>GraphML</strong> is another XML-based file format for graphs.</li>
+                        </ul>
+                        <p>Both formats represent papers as nodes and citations as edges. The application will attempt to determine the correct format automatically.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div id="mainContent" style="display: none;">
+            <div class="row mt-3">
+                <div class="col-md-3">
+                    <div class="card">
+                        <div class="card-header">
+                            <h5>Filters</h5>
+                        </div>
+                        <div class="card-body">
+                            <div class="mb-3">
+                                <label for="clusterFilter" class="form-label">Cluster/Subfield</label>
+                                <select class="form-select" id="clusterFilter">
+                                    <option value="all">All</option>
+                                    <!-- Options will be filled dynamically -->
+                                </select>
+                            </div>
+                            <div class="mb-3">
+                                <label for="authorFilter" class="form-label">Author</label>
+                                <select class="form-select" id="authorFilter">
+                                    <option value="all">All</option>
+                                    <!-- Options will be filled dynamically -->
+                                </select>
+                            </div>
+                            <div class="mb-3">
+                                <label for="yearSlider" class="form-label">Year Range</label>
+                                <div id="yearSlider"></div>
+                                <div class="d-flex justify-content-between mt-2">
+                                    <span id="yearMin"></span>
+                                    <span id="yearMax"></span>
+                                </div>
+                            </div>
+                            <button class="btn btn-primary btn-sm mb-2 w-100" id="applyFiltersBtn">Apply Filters</button>
+                            <button class="btn btn-secondary btn-sm w-100" id="resetFiltersBtn">Reset Filters</button>
+                        </div>
+                    </div>
+                    <div class="card mt-3">
+                        <div class="card-header">
+                            <h5>Network Statistics</h5>
+                        </div>
+                        <div class="card-body">
+                            <table class="table table-sm">
+                                <tbody>
+                                    <tr>
+                                        <th>Nodes</th>
+                                        <td id="statsNodes">0</td>
+                                    </tr>
+                                    <tr>
+                                        <th>Edges</th>
+                                        <td id="statsEdges">0</td>
+                                    </tr>
+                                    <tr>
+                                        <th>Components</th>
+                                        <td id="statsComponents">0</td>
+                                    </tr>
+                                    <tr>
+                                        <th>Density</th>
+                                        <td id="statsDensity">0</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="card">
+                        <div class="card-body p-0">
+                            <div id="graph-container" style="height: 600px;"></div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="card">
+                        <div class="card-header">
+                            <h5>Paper Details</h5>
+                        </div>
+                        <div class="card-body" id="paperDetails">
+                            <div class="alert alert-info">Click on a node in the network to view paper details</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <footer class="footer mt-5 py-3 bg-light">
+        <div class="container text-center">
+            <span class="text-muted">Created with ❤️ for citation network analysis</span>
+        </div>
+    </footer>
+
+    <!-- Load required libraries -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/nouislider@15.7.1/dist/nouislider.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/graphology@0.25.1/dist/graphology.umd.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/graphology-gexf@0.13.0/dist/graphology-gexf.umd.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/graphology-graphml@0.5.1/dist/graphology-graphml.umd.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sigma@3.0.0-alpha3/build/sigma.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/graphology-layout-force@0.2.4/dist/graphology-layout-force.min.js"></script>
+    
+    <!-- Load application scripts -->
+    <script src="js/app-static.js"></script>
+</body>
+</html>
