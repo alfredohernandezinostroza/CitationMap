@@ -1,188 +1,205 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Citation Network Analysis Tool</title>
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/nouislider@15.7.1/dist/nouislider.min.css">
-    <link rel="stylesheet" href="styles.css">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Graph Visualization</title>
+  <style>
+    body {
+      font-family: 'Arial', sans-serif;
+      margin: 0;
+      padding: 0;
+      display: flex;
+      flex-direction: column;
+      height: 100vh;
+    }
+    
+    .header {
+      padding: 0.5rem;
+      background-color: #f0f0f0;
+      text-align: center;
+    }
+    
+    #sigma-container {
+      flex: 1;
+      position: relative;
+      overflow: hidden;
+    }
+  </style>
 </head>
 <body>
-    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
-        <div class="container-fluid">
-            <a class="navbar-brand" href="#">📚 Citation Network Analysis</a>
-            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
-                <span class="navbar-toggler-icon"></span>
-            </button>
-            <div class="collapse navbar-collapse" id="navbarNav">
-                <ul class="navbar-nav">
-                    <li class="nav-item">
-                        <a class="nav-link active" href="index.html">Network Visualization</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="rankings.html">Top Rankings</a>
-                    </li>
-                </ul>
-            </div>
-        </div>
-    </nav>
+  <div class="header">
+    <h1>Motor Learning</h1>
+  </div>
+  
+  <div id="sigma-container"></div>
 
-    <div class="container-fluid">
-        <div class="row mt-3">
-            <div class="col-md-12">
-                <div class="card">
-                    <div class="card-body">
-                        <h2 class="card-title">Citation Network Analysis Tool</h2>
-                        <p class="card-text">
-                            This tool allows you to analyze citation networks by uploading a network file (GEXF or GraphML).
-                            You can visualize the network interactively, explore paper metadata, filter by various criteria,
-                            and view top papers and authors by subfield.
-                        </p>
-                    </div>
-                </div>
-            </div>
-        </div>
+  <!-- Use ES module imports directly in the browser -->
+  <script type="module">
+    // Import libraries from ES modules CDN (skypack, unpkg or esm.sh)
+    import Graph from 'https://cdn.skypack.dev/graphology';
+    import { parse } from 'https://cdn.skypack.dev/graphology-gexf/browser';
+    import Sigma from 'https://cdn.skypack.dev/sigma';
 
-        <div class="row mt-3">
-            <div class="col-md-12">
-                <div class="card">
-                    <div class="card-body">
-                        <h4>Upload Network File</h4>
-                        <div class="mb-3">
-                            <label for="fileInput" class="form-label">Select a GEXF or GraphML file</label>
-                            <input class="form-control" type="file" id="fileInput" accept=".gexf,.graphml,.xml">
-                        </div>
-                        <button class="btn btn-primary" id="uploadBtn">Upload and Analyze</button>
-                        <div class="alert alert-danger mt-3 d-none" id="errorAlert"></div>
-                        <div class="alert alert-success mt-3 d-none" id="successAlert"></div>
-                    </div>
-                </div>
-            </div>
-        </div>
+    // This follows the example structure closely, but loads a specific file
+    const init = () => {
+      let renderer = null;
 
-        <div class="row mt-3" id="noGraphContent">
-            <div class="col-md-12">
-                <div class="card">
-                    <div class="card-body">
-                        <h4>How to use this tool</h4>
-                        <ol>
-                            <li><strong>Upload a network file</strong> (GEXF, GraphML, or XML) using the file uploader above</li>
-                            <li><strong>Explore the network visualization</strong> by zooming, panning, and clicking on nodes</li>
-                            <li><strong>Filter the network</strong> by cluster, year, or author</li>
-                            <li><strong>View paper details</strong> for each node in the network</li>
-                            <li><strong>Navigate to the Top Rankings page</strong> to see top papers and authors by subfield</li>
-                        </ol>
-                        <h5>About network file formats</h5>
-                        <ul>
-                            <li><strong>GEXF</strong> (Graph Exchange XML Format) is an XML-based format for describing network structures.</li>
-                            <li><strong>GraphML</strong> is another XML-based file format for graphs.</li>
-                        </ul>
-                        <p>Both formats represent papers as nodes and citations as edges. The application will attempt to determine the correct format automatically.</p>
-                    </div>
-                </div>
-            </div>
-        </div>
+      // Add a loading indicator
+      const loadingIndicator = document.createElement('div');
+      loadingIndicator.textContent = 'Loading graph...';
+      loadingIndicator.style.margin = '10px';
+      document.querySelector('.header').appendChild(loadingIndicator);
 
-        <div id="mainContent" style="display: none;">
-            <div class="row mt-3">
-                <div class="col-md-3">
-                    <div class="card">
-                        <div class="card-header">
-                            <h5>Filters</h5>
-                        </div>
-                        <div class="card-body">
-                            <div class="mb-3">
-                                <label for="clusterFilter" class="form-label">Cluster/Subfield</label>
-                                <select class="form-select" id="clusterFilter">
-                                    <option value="all">All</option>
-                                    <!-- Options will be filled dynamically -->
-                                </select>
-                            </div>
-                            <div class="mb-3">
-                                <label for="authorFilter" class="form-label">Author</label>
-                                <select class="form-select" id="authorFilter">
-                                    <option value="all">All</option>
-                                    <!-- Options will be filled dynamically -->
-                                </select>
-                            </div>
-                            <div class="mb-3">
-                                <label for="yearSlider" class="form-label">Year Range</label>
-                                <div id="yearSlider"></div>
-                                <div class="d-flex justify-content-between mt-2">
-                                    <span id="yearMin"></span>
-                                    <span id="yearMax"></span>
-                                </div>
-                            </div>
-                            <button class="btn btn-primary btn-sm mb-2 w-100" id="applyFiltersBtn">Apply Filters</button>
-                            <button class="btn btn-secondary btn-sm w-100" id="resetFiltersBtn">Reset Filters</button>
-                        </div>
-                    </div>
-                    <div class="card mt-3">
-                        <div class="card-header">
-                            <h5>Network Statistics</h5>
-                        </div>
-                        <div class="card-body">
-                            <table class="table table-sm">
-                                <tbody>
-                                    <tr>
-                                        <th>Nodes</th>
-                                        <td id="statsNodes">0</td>
-                                    </tr>
-                                    <tr>
-                                        <th>Edges</th>
-                                        <td id="statsEdges">0</td>
-                                    </tr>
-                                    <tr>
-                                        <th>Components</th>
-                                        <td id="statsComponents">0</td>
-                                    </tr>
-                                    <tr>
-                                        <th>Density</th>
-                                        <td id="statsDensity">0</td>
-                                    </tr>
-                                </tbody>
-                            </table>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-md-6">
-                    <div class="card">
-                        <div class="card-body p-0">
-                            <div id="graph-container" style="height: 600px;"></div>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-md-3">
-                    <div class="card">
-                        <div class="card-header">
-                            <h5>Paper Details</h5>
-                        </div>
-                        <div class="card-body" id="paperDetails">
-                            <div class="alert alert-info">Click on a node in the network to view paper details</div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
+      // Load the specific GEXF file directly
+      fetch('./MotorLearning.gexf')
+        .then(response => {
+          if (!response.ok) {
+            throw new Error(`HTTP error! Status: ${response.status}`);
+          }
+          return response.text();
+        })
+        .then(gexf => {
+          // Hide loading indicator
+          loadingIndicator.textContent = 'Graph loaded successfully!';
+          loadingIndicator.style.color = 'green';
+          setTimeout(() => {
+            loadingIndicator.style.display = 'none';
+          }, 2000);
+          
+          // Parse GEXF string:
+          const graph = parse(Graph, gexf);
 
-    <footer class="footer mt-5 py-3 bg-light">
-        <div class="container text-center">
-            <span class="text-muted">Created with ❤️ for citation network analysis</span>
-        </div>
-    </footer>
+          // Retrieve container element
+          const container = document.getElementById("sigma-container");
 
-    <!-- Load required libraries -->
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/nouislider@15.7.1/dist/nouislider.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/graphology@0.25.1/dist/graphology.umd.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/graphology-gexf@0.13.0/dist/graphology-gexf.umd.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/graphology-graphml@0.5.1/dist/graphology-graphml.umd.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/sigma@3.0.0-alpha3/build/sigma.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/graphology-layout-force@0.2.4/dist/graphology-layout-force.min.js"></script>
-    
-    <!-- Load application scripts -->
-    <script src="js/app-static.js"></script>
+          // Clean up previous renderer if it exists
+          if (renderer) {
+            renderer.kill();
+            renderer = null;
+          }
+          
+          // Define state for hover interactions
+          const state = {
+            hoveredNode: undefined,
+            hoveredNeighbors: undefined
+          };
+
+          // Function to handle hover state
+          function setHoveredNode(node) {
+            if (node) {
+              state.hoveredNode = node;
+              state.hoveredNeighbors = new Set(graph.neighbors(node));
+            } else {
+              state.hoveredNode = undefined;
+              state.hoveredNeighbors = undefined;
+            }
+
+            // Refresh rendering without reindexing
+            renderer.refresh({
+              skipIndexation: true,
+            });
+          }
+          
+          // Instantiate sigma with custom settings for labels
+          renderer = new Sigma(graph, container, {
+            minCameraRatio: 0.08,
+            maxCameraRatio: 3,
+            renderLabels: false,
+            labelRenderedSizeThreshold: 7,
+            labelSize: 12,
+            defaultNodeColor: "#6c9",
+            defaultEdgeColor: "#e0e0e0",
+            
+            // Node reducer with hover functionality
+            nodeReducer: (node, data) => {
+              const res = {...data};
+              res.size = data.size / 3; // Reduce node size by half
+              
+              // Apply hover effects
+              if (state.hoveredNeighbors && !state.hoveredNeighbors.has(node) && state.hoveredNode !== node) {
+                res.label = "";
+                res.color = "#f6f6f6";
+                res.opacity = 0.3;
+              }
+              
+              // Highlight hovered node
+              if (state.hoveredNode === node) {
+                res.highlighted = true;
+                res.forceLabel = true;
+              }
+              
+              return res;
+            },
+            
+            // Edge reducer with hover functionality
+            edgeReducer: (edge, data) => {
+              const res = {...data};
+              res.size = 0.00001;        // Base edge width
+              res.color = "#e0e0e0"; // Edge color
+              // Hide edges not connected to hovered node
+              if (
+                state.hoveredNode &&
+                !graph.extremities(edge).every((n) => 
+                  n === state.hoveredNode || 
+                  (state.hoveredNeighbors && state.hoveredNeighbors.has(n))
+                )
+              ) {
+                res.hidden = true;
+              }
+              
+              return res;
+            },
+            
+            // Hover renderer for additional visual cues
+            hoverRenderer: (context, data, settings) => {
+              // This draws the hovered node differently
+              const size = settings.nodeReducer?.(data.node, data.data)?.size || data.data.size;
+              context.beginPath();
+              context.arc(data.x, data.y, size, 0, Math.PI * 2);
+              context.fillStyle = "#FFA500"; // Orange highlight for hovered node
+              context.fill();
+              
+              // Draw the label for the hovered node
+              if (data.label) {
+                context.font = "bold 12px Arial";
+                context.fillStyle = "#000";
+                context.textAlign = "center";
+                context.fillText(data.label, data.x, data.y + size + 12);
+              }
+            }
+          });
+          
+          // Bind graph interactions for hover
+          renderer.on("enterNode", ({ node }) => {
+            setHoveredNode(node);
+          });
+          
+          renderer.on("leaveNode", () => {
+            setHoveredNode(undefined);
+          });
+          
+          // Add minimal keyboard controls for zooming
+          document.addEventListener("keydown", (e) => {
+            const camera = renderer.getCamera();
+            if (e.key === "+" || e.key === "=") {
+              camera.animatedZoom({ duration: 600 });
+            } else if (e.key === "-") {
+              camera.animatedUnzoom({ duration: 600 });
+            } else if (e.key === "0") {
+              camera.animatedReset({ duration: 600 });
+            }
+          });
+        })
+        .catch(error => {
+          loadingIndicator.textContent = `Error loading graph: ${error.message}`;
+          loadingIndicator.style.color = 'red';
+          console.error('Error loading the GEXF file:', error);
+        });
+    };
+
+    // Initialize the app
+    init();
+  </script>
 </body>
 </html>
