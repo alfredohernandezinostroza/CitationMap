@@ -178,10 +178,12 @@
       // Node reducer with hover functionality
       renderer.setSetting( "nodeReducer", function(node, data) {
         const res = { ...data };
+        res.size = data.size / 3; // Reduce node size by half
 
         if (state.hoveredNeighbors && !state.hoveredNeighbors.has(node) && state.hoveredNode !== node) {
           res.label = "";
           res.color = "#f6f6f6";
+          res.opacity = 0.3;
         }
 
         if (state.selectedNode === node) {
@@ -201,7 +203,8 @@
       // Edge reducer with hover functionality
       renderer.setSetting( "edgeReducer", function(edge, data){
         const res = { ...data };
-
+        res.size = 0.00001;        // Base edge width
+        res.color = "#e0e0e0"; // Edge color
         if (
           state.hoveredNode &&
           !graph.extremities(edge).every((n) => n === state.hoveredNode || graph.areNeighbors(n, state.hoveredNode))
