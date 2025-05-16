@@ -95,9 +95,9 @@
       search_input.addEventListener("input", () => {
         setSearchQuery(search_input.value || "", state, search_input, graph, renderer);
       });
-      search_input.addEventListener("blur", () => {
-        setSearchQuery("", state, search_input, graph, renderer);
-      });
+      // search_input.addEventListener("blur", () => {
+      //   setSearchQuery("", state, search_input, graph, renderer);
+      // });
 
       try{
         bind_graph_interactions2(renderer, state);
