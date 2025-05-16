@@ -113,66 +113,6 @@
       });
       return renderer;
     }
-
-    function bind_graph_interactions(renderer, state) {
-      // Node reducer with hover functionality
-      renderer.setSetting( "nodeReducer", function(node, data) {
-        const res = {...data};
-        res.size = data.size / 3; // Reduce node size by half
-        
-        // Apply hover effects
-        if (state.hoveredNeighbors && !state.hoveredNeighbors.has(node) && state.hoveredNode !== node) {
-          res.label = "";
-          res.color = "#f6f6f6";
-          res.opacity = 0.3;
-        }
-        
-        // Highlight hovered node
-        if (state.hoveredNode === node) {
-          res.highlighted = true;
-          res.forceLabel = true;
-        }
-        
-        return res;
-      });
-      
-      // Edge reducer with hover functionality
-      renderer.setSetting( "edgeReducer", function(edge, data){
-        const res = {...data};
-        res.size = 0.00001;        // Base edge width
-        res.color = "#e0e0e0"; // Edge color
-        // Hide edges not connected to hovered node
-        if (
-          state.hoveredNode &&
-          !graph.extremities(edge).every((n) => 
-            n === state.hoveredNode || 
-            (state.hoveredNeighbors && state.hoveredNeighbors.has(n))
-          )
-        ) {
-          res.hidden = true;
-        }
-        
-        return res;
-      });
-      
-      // Hover renderer for additional visual cues
-      renderer.setSetting( "hoverRenderer", function(context, data, settings) {
-        // This draws the hovered node differently
-        const size = settings.nodeReducer?.(data.node, data.data)?.size || data.data.size;
-        context.beginPath();
-        context.arc(data.x, data.y, size, 0, Math.PI * 2);
-        context.fillStyle = "#FFA500"; // Orange highlight for hovered node
-        context.fill();
-        
-        // Draw the label for the hovered node
-        if (data.label) {
-          context.font = "bold 12px Arial";
-          context.fillStyle = "#000";
-          context.textAlign = "center";
-          context.fillText(data.label, data.x, data.y + size + 12);
-        }
-      });
-    }
     
     function bind_graph_interactions2(renderer, state) {
       // Node reducer with hover functionality
@@ -188,7 +128,10 @@
 
         if (state.selectedNode === node) {
           res.highlighted = true;
-        } else if (state.suggestions) {
+          return res;
+        }
+        
+        if (state.suggestions) {
           if (state.suggestions.has(node)) {
             res.forceLabel = true;
           } else {
@@ -196,7 +139,6 @@
             res.color = "#f6f6f6";
           }
         }
-
         return res;
       });
       
