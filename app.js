@@ -7,8 +7,18 @@
     // Load and render the GEXF file
     const graph = await load_gexf();
     let renderer = null;
+    
+      // Define state for hover interactions
+    const state = {
+      hoveredNode: undefined,
+      hoveredNeighbors: undefined,
+      searchQuery: "",
+      selectedNode: "",
+      suggestions: undefined//new Set()
+    };
+
     try {
-      renderer = render_gexf(graph)//.catch(error => console.error('Error rendering gexf', error));
+      renderer = render_gexf(graph, state)//.catch(error => console.error('Error rendering gexf', error));
     } catch (error) {
       console.error("Error rendering gexf", error);
     }
@@ -37,7 +47,7 @@
       return graph
     }
 
-    function render_gexf(graph) {
+    function render_gexf(graph, state) {
       // Clean up previous renderer if it exists
       // if (renderer) {
       //   renderer.kill();
@@ -48,16 +58,7 @@
       const sigma_container = document.getElementById("sigma-container");
       const search_input = document.getElementById("search-input");
       const search_suggestions = document.getElementById("suggestions");
-
-
-      // Define state for hover interactions
-      const state = {
-        hoveredNode: undefined,
-        hoveredNeighbors: undefined,
-        searchQuery: "",
-        selectedNode: "",
-        suggestions: undefined//new Set()
-      };
+      const search_suggestions_2 = document.getElementById("suggestions-2");
 
       // Feed the datalist autocomplete values:
       search_suggestions.innerHTML = graph
