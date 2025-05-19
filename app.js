@@ -32,7 +32,8 @@
       loadingIndicator.style.margin = '10px';
       document.querySelector('.header').appendChild(loadingIndicator);
 
-      let res = await fetch('./MotorLearning.gexf');
+      // let res = await fetch('./MotorLearning.gexf');
+      let res = await fetch('./with_list_authors_deleted_outside_bounds.gexf');
       let to_parse = await res.text();
 
       
