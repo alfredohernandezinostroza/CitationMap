@@ -95,7 +95,7 @@
       
       // Bind search input interactions:
       search_input.addEventListener("input", () => {
-        setSearchQuery(search_input.value || "", state, search_input, graph, renderer);
+        setSearchQuery(state, search_input, graph, renderer);
       });
       // search_input.addEventListener("blur", () => {
       //   setSearchQuery("", state, search_input, graph, renderer);
@@ -185,12 +185,16 @@
       });
     }
 
-    function setSearchQuery(query, state, search_input, graph, renderer) {
-      state.searchQuery = query;
+    function setSearchQuery(state, search_input, graph, renderer, search_inputs) {
+    // function setSearchQuery(query, state, search_input, graph, renderer) {
+      // state.searchQuery = query;
 
-      if (search_input.value !== query) search_input.value = query;
-
-      if (query) {
+    //   if (search_input.value !== query){
+    //     search_input.value = query
+    //     console.log(`${query} vs ${search_input.value}`);
+    // }
+      const query = search_inputs.value
+      if (query !== "") { 
         const lcQuery = query.toLowerCase();
         const suggestions = graph
           .nodes()
