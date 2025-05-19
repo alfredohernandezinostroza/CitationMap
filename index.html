@@ -33,9 +33,15 @@
   </div>
   
   <div id="sigma-container"></div>
-  <div id="search">
-      <input type="search" id="search-input" list="suggestions" placeholder="Try searching for a node...">
-      <datalist id="suggestions"></datalist>
+  <div id="search-container">
+    <div id="search">
+        <input type="search" id="search-input" list="suggestions" placeholder="Try searching for a node...">
+        <datalist id="suggestions"></datalist>
+    </div>
+    <div id="search-2">
+      <input type="search" id="search-input-2" list="suggestions-2" placeholder="Try searching for an author...">
+      <datalist id="suggestions-2"></datalist>
+    </div>
   </div>
   <!-- Use ES module imports directly in the browser -->
   <script type="module" src="app.js">

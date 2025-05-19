@@ -57,7 +57,12 @@
 
       // Retrieve container element
       const sigma_container = document.getElementById("sigma-container");
+      const search_container = document.getElementById("search-container");
+      const search_inputs = search_container.querySelectorAll('input[type="search"]')
+      console.log(search_inputs)
       const search_input = document.getElementById("search-input");
+      const search_input_2 = document.getElementById("search-input-2");
+      console.log(search_input === search_inputs[0], search_input_2 === search_inputs[1])
       const search_suggestions = document.getElementById("suggestions");
       const search_suggestions_2 = document.getElementById("suggestions-2");
 
@@ -65,6 +70,11 @@
       search_suggestions.innerHTML = graph
         .nodes()
         .map((node) => `<option value="${graph.getNodeAttribute(node, "label")}"></option>`)
+        .join("\n");
+      
+      search_suggestions_2.innerHTML = graph
+        .nodes()
+        .map((node) => `<option value="${graph.getNodeAttribute(node, "author")}"></option>`)
         .join("\n");
       
       // Function to handle hover state
@@ -95,7 +105,10 @@
       
       // Bind search input interactions:
       search_input.addEventListener("input", () => {
-        setSearchQuery(state, search_input, graph, renderer);
+        setSearchQuery2(state, graph, renderer, search_inputs);
+      });
+      search_input_2.addEventListener("input", () => {
+        setSearchQuery2(state, graph, renderer, search_inputs);
       });
       // search_input.addEventListener("blur", () => {
       //   setSearchQuery("", state, search_input, graph, renderer);
@@ -185,7 +198,7 @@
       });
     }
 
-    function setSearchQuery(state, search_input, graph, renderer, search_inputs) {
+    function setSearchQuery(state, search_input, property, graph, renderer, search_inputs) {
     // function setSearchQuery(query, state, search_input, graph, renderer) {
       // state.searchQuery = query;
 
@@ -193,13 +206,14 @@
     //     search_input.value = query
     //     console.log(`${query} vs ${search_input.value}`);
     // }
-      const query = search_inputs.value
+      const query = search_input.value
       if (query !== "") { 
         const lcQuery = query.toLowerCase();
         const suggestions = graph
           .nodes()
-          .map((n) => ({ id: n, label: graph.getNodeAttribute(n, "label")}))
-          .filter(({ label }) => label.toLowerCase().includes(lcQuery));
+          .map((n) => ({ id: n, prop: graph.getNodeAttribute(n, property)}))
+          .filter(({ prop }) => prop.some(v => 
+            v.toLowerCase().includes(lcQuery)));
 
         // If we have a single perfect match, them we remove the suggestions, and
         // we consider the user has selected a node through the datalist
@@ -226,6 +240,109 @@
         state.suggestions = undefined;
       }
 
+      // Refresh rendering
+      // You can directly call `renderer.refresh()`, but if you need performances
+      // you can provide some options to the refresh method.
+      // In this case, we don't touch the graph data so we can skip its reindexation
+      renderer.refresh({
+        skipIndexation: true,
+      });
+    }
+
+
+    function setSearchQuery2(state, graph, renderer, search_inputs) {
+      const query_label = search_inputs[0].value
+      const query_author = search_inputs[1].value
+      let suggestions_label = undefined;
+      let suggestions_author = undefined;
+      if (query_label !== "") {
+        const lcQuery = query_label.toLowerCase();
+        suggestions_label = graph.nodes().map((n) => ({ id: n, prop: graph.getNodeAttribute(n, "label")}))
+          .filter(({ prop }) => prop.toLowerCase().includes(lcQuery));
+        suggestions_label = new Set(suggestions_label.map(({ id }) => id));
+      }
+      if (query_author !== "") {
+        const lcQuery = query_author.toLowerCase();
+        suggestions_author = graph.nodes().map((n) => ({ id: n, prop: graph.getNodeAttribute(n, "author")}))
+          .filter(({ prop }) => prop.some(v => v.toLowerCase().includes(lcQuery)));
+        suggestions_author = new Set(suggestions_author.map(({ id }) => id));
+      }
+      if (suggestions_label && suggestions_author)
+        state.suggestions = suggestions_label.intersection(suggestions_author)
+      else if (suggestions_label)
+        state.suggestions = suggestions_label
+      else if (suggestions_author)
+        state.suggestions = suggestions_author
+      else
+        state.suggestions = undefined;
+      renderer.refresh({
+        skipIndexation: true,
+      });
+    }
+
+
+    function setSearchQueryMulti(state, search_input, property, graph, renderer, search_inputs) {
+      // function setSearchQuery(query, state, search_input, graph, renderer) {
+        // state.searchQuery = query;
+
+      //   if (search_input.value !== query){
+      //     search_input.value = query
+      //     console.log(`${query} vs ${search_input.value}`);
+      // }
+      const suggestions_array = [undefined, undefined];
+      const properties = ['label', 'author']
+      search_inputs.forEach( (search_input, i) => {
+        const query = search_input.value
+        if (query !== "") { 
+          const lcQuery = query.toLowerCase();
+          const suggestions = graph
+          .nodes()
+          .map((n) => ({ id: n, prop: graph.getNodeAttribute(n, properties[i])}))
+          .filter(({ prop }) => {
+            if (Array.isArray(prop)) {
+              prop.some(v => v.toLowerCase().includes(lcQuery));
+            } else {
+              prop.toLowerCase().includes(lcQuery);
+            }
+          });
+          console.log(suggestions)
+            // If we have a single perfect match, them we remove the suggestions, and
+            // we consider the user has selected a node through the datalist
+            // autocomplete:
+            if (suggestions.length === 1 && suggestions[0].label === query) {
+              state.selectedNode = suggestions[0].id;
+              state.suggestions = undefined;
+              
+            // Move the camera to center it on the selected node:
+            const nodePosition = renderer.getNodeDisplayData(state.selectedNode);
+            renderer.getCamera().animate(nodePosition, {
+              duration: 500,
+            });
+          }
+          // Else, we display the suggestions list:
+          else {
+            state.selectedNode = undefined;
+            suggestions_array[i] = new Set(suggestions.map(({ id }) => id));
+            // state.suggestions = new Set(suggestions.map(({ id }) => id));
+          }
+        }
+        // If the query is empty, then we reset the selectedNode / suggestions state:
+        else {
+          state.selectedNode = undefined;
+          suggestions_array[i] = undefined
+          // state.suggestions = undefined;
+        }
+      });
+      console.log(`label: ${Boolean(suggestions_array[0])}, author: ${Boolean(suggestions_array[1])}`)
+      if (suggestions_array[0] && suggestions_array[1])
+        state.suggestions = suggestions_array[0].union(suggestions_array[1])
+      else if (suggestions_array[0])
+        state.suggestions = suggestions_array[0]
+      else if (suggestions_array[1])
+        state.suggestions = suggestions_array[1]
+      else
+        state.suggestions = undefined
+      console.log(state.suggestions)
       // Refresh rendering
       // You can directly call `renderer.refresh()`, but if you need performances
       // you can provide some options to the refresh method.
