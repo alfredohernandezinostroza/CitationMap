@@ -101,6 +101,8 @@
         labelSize: 12,
         defaultNodeColor: "#6c9",
         defaultEdgeColor: "#e0e0e0",
+zIndex: true,
+    enableHovering: false,
       });
       
       // Bind search input interactions:
@@ -119,6 +121,12 @@
       } catch (error) {
         console.error('Error binding graph interactions:', error);
       }
+//Bind click behavior
+  renderer.on("clickNode", ({ node }) => {
+    const nodeData = graph.getNodeAttributes(node);
+    // console.log(nodeData)
+    renderCard(nodeData);
+  });
       // Bind graph interactions for hover
       renderer.on("enterNode", ({ node }) => {
         setHoveredNode(node);
@@ -149,9 +157,12 @@
         if (state.suggestions) {
           if (state.suggestions.has(node)) {
             res.forceLabel = true;
+res.zIndex = 10;
           } else {
             res.label = "";
             res.color = "#f6f6f6";
+res.opacity = 0.3;
+        res.zIndex = 0;
           }
         }
         return res;
@@ -169,20 +180,29 @@
           res.hidden = true;
         }
 
-        if (
-          state.suggestions &&
-          (!state.suggestions.has(graph.source(edge)) || !state.suggestions.has(graph.target(edge)))
-        ) {
+        if (          state.suggestions) {
+      if (
+!state.suggestions.has(graph.source(edge)) ||
+!state.suggestions.has(graph.target(edge))
+      )
           res.hidden = true;
+else res.zIndex = 11;
         }
 
         return res;
       });
       
       // Hover renderer for additional visual cues
-      renderer.setSetting( "hoverRenderer", function(context, data, settings) {
+      renderer.setSetting(
+    "defaultDrawNodeHover",
+function (context, data, settings) {
+debugger;
+      // if (state.query_label !== "" && state.query_author !== "") {
+      console.log("hivierRender function");
         // This draws the hovered node differently
-        const size = settings.nodeReducer?.(data.node, data.data)?.size || data.data.size;
+        const size =
+settings.nodeReducer?.(data.node, data.data)?.size || data.size;
+// const size = 10;
         context.beginPath();
         context.arc(data.x, data.y, size, 0, Math.PI * 2);
         context.fillStyle = "#FFA500"; // Orange highlight for hovered node
@@ -190,12 +210,57 @@
         
         // Draw the label for the hovered node
         if (data.label) {
-          context.font = "bold 12px Arial";
-          context.fillStyle = "#000";
-          context.textAlign = "center";
-          context.fillText(data.label, data.x, data.y + size + 12);
+          const size = settings.labelSize,
+          font = settings.labelFont,
+          weight = settings.labelWeight;
+
+        context.font = `${weight} ${size}px ${font}`;
+
+        // Then we draw the label background
+          context.fillStyle = "#FFF";
+        context.shadowOffsetX = 0;
+        context.shadowOffsetY = 0;
+        context.shadowBlur = 8;
+        context.shadowColor = "#000";
+
+        const PADDING = 2;
+
+        const textWidth = context.measureText(data.label).width,
+          boxWidth = Math.round(textWidth + 5),
+          boxHeight = Math.round(size + 2 * PADDING),
+          radius = Math.max(data.size, size / 2) + PADDING;
+
+        const angleRadian = Math.asin(boxHeight / 2 / radius);
+        const xDeltaCoord = Math.sqrt(
+          Math.abs(Math.pow(radius, 2) - Math.pow(boxHeight / 2, 2))
+        );
+
+        context.beginPath();
+        context.moveTo(data.x + xDeltaCoord, data.y + boxHeight / 2);
+        context.lineTo(data.x + radius + boxWidth, data.y + boxHeight / 2);
+        context.lineTo(data.x + radius + boxWidth, data.y - boxHeight / 2);
+        context.lineTo(data.x + xDeltaCoord, data.y - boxHeight / 2);
+        context.arc(data.x, data.y, radius, angleRadian, -angleRadian);
+        context.closePath();
+        context.fill();
+
+        context.shadowOffsetX = 0;
+        context.shadowOffsetY = 0;
+        context.shadowBlur = 0;
+
+        const color = settings.labelColor.attribute
+          ? data[settings.labelColor.attribute] ||
+            settings.labelColor.color ||
+            "#000"
+          : settings.labelColor.color;
+
+        context.fillStyle = color;
+
+          context.fillText(data.label, data.x + data.size + 3, data.y + size / 3);
         }
-      });
+      // }
+    }
+);
     }
 
     function setSearchQuery(state, search_input, property, graph, renderer, search_inputs) {
