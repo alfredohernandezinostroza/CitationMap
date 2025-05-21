@@ -1,50 +1,113 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Graph Visualization</title>
-  <style>
-    body {
-      font-family: 'Arial', sans-serif;
-      margin: 0;
-      padding: 0;
-      display: flex;
-      flex-direction: column;
-      height: 100vh;
-    }
-    
-    .header {
-      padding: 0.5rem;
-      background-color: #f0f0f0;
-      text-align: center;
-    }
-    
-    #sigma-container {
-      flex: 1;
-      position: relative;
-      overflow: hidden;
-    }
-  </style>
-</head>
-<body>
-  <div class="header">
-    <h1>Motor Learning AAA</h1>
-  </div>
-  
-  <div id="sigma-container"></div>
-  <div id="search-container">
-    <div id="search">
-        <input type="search" id="search-input" list="suggestions" placeholder="Try searching for a node...">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Graph Visualization</title>
+    <style>
+      body {
+        font-family: "Arial", sans-serif;
+        margin: 0;
+        padding: 0;
+        display: flex;
+        flex-direction: column;
+        height: 100vh;
+      }
+
+      .header {
+        padding: 0.5rem;
+        background-color: #f0f0f0;
+        text-align: center;
+      }
+
+      #sigma-container {
+        flex: 1;
+        position: relative;
+        overflow: hidden;
+      }
+
+      .card-container {
+        position: fixed;
+        bottom: 0;
+        left: 50%;
+        transform: translate(-50%, 0%);
+        z-index: 1000;
+        width: 95%;
+        height: 53.5%;
+      }
+      .card-contents {
+        /* bottom: 0; */
+        /* left: 50%;
+        transform: translate(-50%, 0); */
+        border-radius: 25px;
+        height: 67.5%;
+        border: 2px solid Black;
+        padding: 15px 15px 15px 15px;
+        margin: 20px 20px 20px 20px;
+        background: #c9dbe6;
+        overflow: visible;
+        box-shadow: 5px 5px 2px #888888;
+        /* position: relative; */
+        /* z-index: 1000; */
+        /* position: fixed; */
+        overflow-y: auto;
+        overflow-x: hidden;
+      }
+
+      .close-button:hover {
+        cursor: pointer;
+        background: rgb(255, 66, 66);
+        transition: background-color 0.2s ease-in-out;
+      }
+      .close-button {
+        color: #888888;
+        position: absolute;
+        border-radius: 50%;
+        background: white;
+        top: 6.5px;
+        right: 3px;
+        font-size: 1.2em;
+        width: 2em;
+        height: 2em;
+        z-index: 1001;
+        /* position: relative;
+        top: 10px;
+        left: auto;
+        right: 10px;
+        font-size: 18px;
+        cursor: pointer; */
+      }
+    </style>
+  </head>
+  <body>
+    <div class="header">
+      <h1>Motor Learning AAA</h1>
+    </div>
+
+    <div id="sigma-container"></div>
+    <div id="search-container">
+      <div id="search">
+        <input
+          type="search"
+          id="search-input"
+          list="suggestions"
+          placeholder="Try searching for a node..."
+        />
         <datalist id="suggestions"></datalist>
+      </div>
+      <div id="search-2">
+        <input
+          type="search"
+          id="search-input-2"
+          list="suggestions-2"
+          placeholder="Try searching for an author..."
+        />
+        <datalist id="suggestions-2"></datalist>
+      </div>
     </div>
-    <div id="search-2">
-      <input type="search" id="search-input-2" list="suggestions-2" placeholder="Try searching for an author...">
-      <datalist id="suggestions-2"></datalist>
-    </div>
-  </div>
-  <!-- Use ES module imports directly in the browser -->
-  <script type="module" src="app.js">
-  </script>
-</body>
+
+    <div class="card-container" style="display: none"></div>
+    <!-- Use ES module imports directly in the browser -->
+    <script type="module" src="app.js"></script>
+  </body>
 </html>
