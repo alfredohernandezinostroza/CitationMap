@@ -412,13 +412,25 @@ function setSearchQuery3(state, graph, renderer, search_inputs) {
     suggestions_label = new Set(suggestions_label.map(({ id }) => id));
   }
   if (query_author !== '') {
-    const lcQuery = query_author.toLowerCase();
-    suggestions_author = graph
-      .nodes()
-      .map((n) => ({ id: n, prop: graph.getNodeAttribute(n, 'author') }))
-      .filter(({ prop }) => prop.some((v) => v.toLowerCase().includes(lcQuery)));
-    suggestions_author = new Set(suggestions_author.map(({ id }) => id));
+    const queries = query_author.split(',');
+    suggestions_author = new Set();
+    queries.forEach((query) => {
+      const lcQuery = query.toLowerCase();
+      let suggestions = graph
+        .nodes()
+        .map((n) => ({ id: n, array_prop: graph.getNodeAttribute(n, 'author') }))
+        .filter(({ array_prop }) => array_prop.some((v) => v.toLowerCase().includes(lcQuery)));
+      suggestions_author = suggestions_author.union(new Set(suggestions.map(({ id }) => id)));
+    });
   }
+  // if (query_author !== '') {
+  //   const lcQuery = query_author.toLowerCase();
+  //   suggestions_author = graph
+  //     .nodes()
+  //     .map((n) => ({ id: n, prop: graph.getNodeAttribute(n, 'author') }))
+  //     .filter(({ prop }) => prop.some((v) => v.toLowerCase().includes(lcQuery)));
+  //   suggestions_author = new Set(suggestions_author.map(({ id }) => id));
+  // }
   if (query_abstract !== '') {
     const lcQuery = query_abstract.toLowerCase();
     suggestions_abstract = graph
@@ -436,13 +448,25 @@ function setSearchQuery3(state, graph, renderer, search_inputs) {
     suggestions_journal = new Set(suggestions_journal.map(({ id }) => id));
   }
   if (query_keywords !== '') {
-    const lcQuery = query_keywords.toLowerCase();
-    suggestions_keywords = graph
-      .nodes()
-      .map((n) => ({ id: n, prop: graph.getNodeAttribute(n, 'keywords') }))
-      .filter(({ prop }) => prop.some((v) => v.toLowerCase().includes(lcQuery)));
-    suggestions_keywords = new Set(suggestions_keywords.map(({ id }) => id));
+    const queries = query_keywords.split(',');
+    suggestions_keywords = new Set();
+    queries.forEach((query) => {
+      const lcQuery = query.toLowerCase();
+      let suggestions = graph
+        .nodes()
+        .map((n) => ({ id: n, array_prop: graph.getNodeAttribute(n, 'keywords') }))
+        .filter(({ array_prop }) => array_prop.some((v) => v.toLowerCase().includes(lcQuery)));
+      suggestions_keywords = suggestions_keywords.union(new Set(suggestions.map(({ id }) => id)));
+    });
   }
+  // if (query_keywords !== '') {
+  //   const lcQuery = query_keywords.toLowerCase();
+  //   suggestions_keywords = graph
+  //     .nodes()
+  //     .map((n) => ({ id: n, prop: graph.getNodeAttribute(n, 'keywords') }))
+  //     .filter(({ prop }) => prop.some((v) => v.toLowerCase().includes(lcQuery)));
+  //   suggestions_keywords = new Set(suggestions_keywords.map(({ id }) => id));
+  // }
   const definedSuggestions = [
     suggestions_label,
     suggestions_author,
@@ -552,6 +576,7 @@ function renderCard(nodeData) {
       <h3>${nodeData.label}</h3>
       <p>Authors: ${nodeData.author.join(', ')}</p>
       <p>Abstract: ${abstract}</p>
+      ${nodeData.keywords.length > 0 ? `<p>Keywords: ${nodeData.keywords}</p>` : ''}
       <p>Year: ${nodeData.date}</p>
       <p>Journal: ${nodeData.journal}</p>
       <p>Citations: ${nodeData.citationcount}</p>
