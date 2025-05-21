@@ -1,7 +1,7 @@
 // Import libraries from ES modules CDN (skypack, unpkg or esm.sh)
-import Graph from "https://cdn.skypack.dev/graphology";
-import { parse } from "https://cdn.skypack.dev/graphology-gexf/browser";
-import Sigma from "https://cdn.skypack.dev/sigma";
+import Graph from 'https://cdn.skypack.dev/graphology';
+import { parse } from 'https://cdn.skypack.dev/graphology-gexf/browser';
+import Sigma from 'https://cdn.skypack.dev/sigma';
 // import Sigma from "https://cdnjs.cloudflare.com/ajax/libs/sigma.js/3.0.1/sigma.min.js"
 // import {Sigma} from "https://cdnjs.cloudflare.com/ajax/libs/sigma.js/3.0.0/sigma.min.js"
 // <script src="https://cdnjs.cloudflare.com/ajax/libs/graphology/[VERSION]/graphology.umd.min.js"></script>
@@ -14,37 +14,38 @@ let renderer = null;
 const state = {
   hoveredNode: undefined,
   hoveredNeighbors: undefined,
-  searchQuery: "",
-  selectedNode: "",
+  searchQuery: '',
+  selectedNode: '',
   suggestions: undefined, //new Set()
-  query_label: "",
-  query_author: "",
+  query_label: '',
+  query_author: '',
 };
 
 try {
   renderer = render_gexf(graph, state); //.catch(error => console.error('Error rendering gexf', error));
 } catch (error) {
-  console.error("Error rendering gexf", error);
+  console.error('Error rendering gexf', error);
 }
 
 async function load_gexf() {
   let renderer = null;
 
   // Add a loading indicator
-  const loadingIndicator = document.createElement("div");
-  loadingIndicator.textContent = "Loading graph...";
-  loadingIndicator.style.margin = "10px";
-  document.querySelector(".header").appendChild(loadingIndicator);
+  const loadingIndicator = document.createElement('div');
+  loadingIndicator.textContent = 'Loading graph...';
+  loadingIndicator.style.margin = '10px';
+  document.querySelector('.header').appendChild(loadingIndicator);
 
   // let res = await fetch('./MotorLearning.gexf');
-  let res = await fetch("./with_list_authors_deleted_outside_bounds.gexf");
+  let res = await fetch('./just_center.gexf');
+  // let res = await fetch("./with_list_authors_deleted_outside_bounds.gexf");
   let to_parse = await res.text();
 
   // Hide loading indicator
-  loadingIndicator.textContent = "Graph loaded successfully!";
-  loadingIndicator.style.color = "green";
+  loadingIndicator.textContent = 'Graph loaded successfully!';
+  loadingIndicator.style.color = 'green';
   setTimeout(() => {
-    loadingIndicator.style.display = "none";
+    loadingIndicator.style.display = 'none';
   }, 4000);
 
   const graph = parse(Graph, to_parse);
@@ -59,37 +60,26 @@ function render_gexf(graph, state) {
   // }
 
   // Retrieve container element
-  const sigma_container = document.getElementById("sigma-container");
-  const search_container = document.getElementById("search-container");
-  const search_inputs = search_container.querySelectorAll(
-    'input[type="search"]'
-  );
+  const sigma_container = document.getElementById('sigma-container');
+  const search_container = document.getElementById('search-container');
+  const search_inputs = search_container.querySelectorAll('input[type="search"]');
   console.log(search_inputs);
-  const search_input = document.getElementById("search-input");
-  const search_input_2 = document.getElementById("search-input-2");
-  console.log(
-    search_input === search_inputs[0],
-    search_input_2 === search_inputs[1]
-  );
-  const search_suggestions = document.getElementById("suggestions");
-  const search_suggestions_2 = document.getElementById("suggestions-2");
+  const search_input = document.getElementById('search-input');
+  const search_input_2 = document.getElementById('search-input-2');
+  console.log(search_input === search_inputs[0], search_input_2 === search_inputs[1]);
+  const search_suggestions = document.getElementById('suggestions');
+  const search_suggestions_2 = document.getElementById('suggestions-2');
 
   // Feed the datalist autocomplete values:
   search_suggestions.innerHTML = graph
     .nodes()
-    .map(
-      (node) =>
-        `<option value="${graph.getNodeAttribute(node, "label")}"></option>`
-    )
-    .join("\n");
+    .map((node) => `<option value="${graph.getNodeAttribute(node, 'label')}"></option>`)
+    .join('\n');
 
   search_suggestions_2.innerHTML = graph
     .nodes()
-    .map(
-      (node) =>
-        `<option value="${graph.getNodeAttribute(node, "author")}"></option>`
-    )
-    .join("\n");
+    .map((node) => `<option value="${graph.getNodeAttribute(node, 'author')}"></option>`)
+    .join('\n');
 
   // Function to handle hover state
   function setHoveredNode(node) {
@@ -119,17 +109,17 @@ function render_gexf(graph, state) {
     renderLabels: false,
     labelRenderedSizeThreshold: 7,
     labelSize: 12,
-    defaultNodeColor: "#6c9",
-    defaultEdgeColor: "#e0e0e0",
+    defaultNodeColor: '#6c9',
+    defaultEdgeColor: '#e0e0e0',
     zIndex: true,
     enableHovering: false,
   });
 
   // Bind search input interactions:
-  search_input.addEventListener("input", () => {
+  search_input.addEventListener('input', () => {
     setSearchQuery2(state, graph, renderer, search_inputs);
   });
-  search_input_2.addEventListener("input", () => {
+  search_input_2.addEventListener('input', () => {
     setSearchQuery2(state, graph, renderer, search_inputs);
   });
   // search_input.addEventListener("blur", () => {
@@ -139,19 +129,19 @@ function render_gexf(graph, state) {
   try {
     bind_graph_interactions2(renderer, state);
   } catch (error) {
-    console.error("Error binding graph interactions:", error);
+    console.error('Error binding graph interactions:', error);
   }
   //Bind click behavior
-  renderer.on("clickNode", ({ node }) => {
+  renderer.on('clickNode', ({ node }) => {
     const nodeData = graph.getNodeAttributes(node);
     // console.log(nodeData)
     renderCard(nodeData);
   });
   // Bind graph interactions for hover
-  renderer.on("enterNode", ({ node }) => {
+  renderer.on('enterNode', ({ node }) => {
     setHoveredNode(node);
   });
-  renderer.on("leaveNode", () => {
+  renderer.on('leaveNode', () => {
     setHoveredNode(undefined);
   });
   return renderer;
@@ -159,17 +149,13 @@ function render_gexf(graph, state) {
 
 function bind_graph_interactions2(renderer, state) {
   // Node reducer with hover functionality
-  renderer.setSetting("nodeReducer", function (node, data) {
+  renderer.setSetting('nodeReducer', function (node, data) {
     const res = { ...data };
     // res.size = data.size / 3; // Reduce node size by half
 
-    if (
-      state.hoveredNeighbors &&
-      !state.hoveredNeighbors.has(node) &&
-      state.hoveredNode !== node
-    ) {
-      res.label = "";
-      res.color = "#f6f6f6";
+    if (state.hoveredNeighbors && !state.hoveredNeighbors.has(node) && state.hoveredNode !== node) {
+      res.label = '';
+      res.color = '#f6f6f6';
       res.opacity = 0.3;
     }
 
@@ -183,8 +169,8 @@ function bind_graph_interactions2(renderer, state) {
         res.forceLabel = true;
         res.zIndex = 10;
       } else {
-        res.label = "";
-        res.color = "#f6f6f6";
+        res.label = '';
+        res.color = '#f6f6f6';
         res.opacity = 0.3;
         res.zIndex = 0;
       }
@@ -193,112 +179,87 @@ function bind_graph_interactions2(renderer, state) {
   });
 
   // Edge reducer with hover functionality
-  renderer.setSetting("edgeReducer", function (edge, data) {
+  renderer.setSetting('edgeReducer', function (edge, data) {
     const res = { ...data };
     res.size = 0.00001; // Base edge width
-    res.color = "#e0e0e0"; // Edge color
+    res.color = '#e0e0e0'; // Edge color
     if (
       state.hoveredNode &&
-      !graph
-        .extremities(edge)
-        .every(
-          (n) =>
-            n === state.hoveredNode || graph.areNeighbors(n, state.hoveredNode)
-        )
+      !graph.extremities(edge).every((n) => n === state.hoveredNode || graph.areNeighbors(n, state.hoveredNode))
     ) {
       res.hidden = true;
     }
 
     if (state.suggestions) {
-      if (
-        !state.suggestions.has(graph.source(edge)) ||
-        !state.suggestions.has(graph.target(edge))
-      )
-        res.hidden = true;
+      if (!state.suggestions.has(graph.source(edge)) || !state.suggestions.has(graph.target(edge))) res.hidden = true;
       else res.zIndex = 11;
     }
     return res;
   });
 
   // Hover renderer for additional visual cues
-  renderer.setSetting(
-    "defaultDrawNodeHover",
-    function (context, data, settings) {
-      debugger;
-      // if (state.query_label !== "" && state.query_author !== "") {
-      console.log("hivierRender function");
-      // This draws the hovered node differently
-      const size =
-        settings.nodeReducer?.(data.node, data.data)?.size || data.size;
-      // const size = 10;
+  renderer.setSetting('defaultDrawNodeHover', function (context, data, settings) {
+    debugger;
+    // if (state.query_label !== "" && state.query_author !== "") {
+    // This draws the hovered node differently
+    const size = settings.nodeReducer?.(data.node, data.data)?.size || data.size;
+    // const size = 10;
+    context.beginPath();
+    context.arc(data.x, data.y, size, 0, Math.PI * 2);
+    context.fillStyle = '#FFA500'; // Orange highlight for hovered node
+    context.fill();
+
+    // Draw the label for the hovered node
+    if (data.label) {
+      const size = settings.labelSize,
+        font = settings.labelFont,
+        weight = settings.labelWeight;
+
+      context.font = `${weight} ${size}px ${font}`;
+
+      // Then we draw the label background
+      context.fillStyle = '#FFF';
+      context.shadowOffsetX = 0;
+      context.shadowOffsetY = 0;
+      context.shadowBlur = 8;
+      context.shadowColor = '#000';
+
+      const PADDING = 2;
+
+      const textWidth = context.measureText(data.label).width,
+        boxWidth = Math.round(textWidth + 5),
+        boxHeight = Math.round(size + 2 * PADDING),
+        radius = Math.max(data.size, size / 2) + PADDING;
+
+      const angleRadian = Math.asin(boxHeight / 2 / radius);
+      const xDeltaCoord = Math.sqrt(Math.abs(Math.pow(radius, 2) - Math.pow(boxHeight / 2, 2)));
+
       context.beginPath();
-      context.arc(data.x, data.y, size, 0, Math.PI * 2);
-      context.fillStyle = "#FFA500"; // Orange highlight for hovered node
+      context.moveTo(data.x + xDeltaCoord, data.y + boxHeight / 2);
+      context.lineTo(data.x + radius + boxWidth, data.y + boxHeight / 2);
+      context.lineTo(data.x + radius + boxWidth, data.y - boxHeight / 2);
+      context.lineTo(data.x + xDeltaCoord, data.y - boxHeight / 2);
+      context.arc(data.x, data.y, radius, angleRadian, -angleRadian);
+      context.closePath();
       context.fill();
 
-      // Draw the label for the hovered node
-      if (data.label) {
-        const size = settings.labelSize,
-          font = settings.labelFont,
-          weight = settings.labelWeight;
+      context.shadowOffsetX = 0;
+      context.shadowOffsetY = 0;
+      context.shadowBlur = 0;
 
-        context.font = `${weight} ${size}px ${font}`;
+      const color = settings.labelColor.attribute
+        ? data[settings.labelColor.attribute] || settings.labelColor.color || '#000'
+        : settings.labelColor.color;
 
-        // Then we draw the label background
-        context.fillStyle = "#FFF";
-        context.shadowOffsetX = 0;
-        context.shadowOffsetY = 0;
-        context.shadowBlur = 8;
-        context.shadowColor = "#000";
+      context.fillStyle = color;
 
-        const PADDING = 2;
-
-        const textWidth = context.measureText(data.label).width,
-          boxWidth = Math.round(textWidth + 5),
-          boxHeight = Math.round(size + 2 * PADDING),
-          radius = Math.max(data.size, size / 2) + PADDING;
-
-        const angleRadian = Math.asin(boxHeight / 2 / radius);
-        const xDeltaCoord = Math.sqrt(
-          Math.abs(Math.pow(radius, 2) - Math.pow(boxHeight / 2, 2))
-        );
-
-        context.beginPath();
-        context.moveTo(data.x + xDeltaCoord, data.y + boxHeight / 2);
-        context.lineTo(data.x + radius + boxWidth, data.y + boxHeight / 2);
-        context.lineTo(data.x + radius + boxWidth, data.y - boxHeight / 2);
-        context.lineTo(data.x + xDeltaCoord, data.y - boxHeight / 2);
-        context.arc(data.x, data.y, radius, angleRadian, -angleRadian);
-        context.closePath();
-        context.fill();
-
-        context.shadowOffsetX = 0;
-        context.shadowOffsetY = 0;
-        context.shadowBlur = 0;
-
-        const color = settings.labelColor.attribute
-          ? data[settings.labelColor.attribute] ||
-            settings.labelColor.color ||
-            "#000"
-          : settings.labelColor.color;
-
-        context.fillStyle = color;
-
-        context.fillText(data.label, data.x + data.size + 3, data.y + size / 3);
-      }
-      // }
+      context.fillText(data.label, data.x + data.size + 3, data.y + size / 3);
     }
-  );
+    // }
+  });
 }
 
-function setSearchQuery(
-  state,
-  search_input,
-  property,
-  graph,
-  renderer,
-  search_inputs
-) {
+function setSearchQuery(state, search_input, property, graph, renderer, search_inputs) {
   // function setSearchQuery(query, state, search_input, graph, renderer) {
   // state.searchQuery = query;
 
@@ -307,14 +268,12 @@ function setSearchQuery(
   //     console.log(`${query} vs ${search_input.value}`);
   // }
   const query = search_input.value;
-  if (query !== "") {
+  if (query !== '') {
     const lcQuery = query.toLowerCase();
     const suggestions = graph
       .nodes()
       .map((n) => ({ id: n, prop: graph.getNodeAttribute(n, property) }))
-      .filter(({ prop }) =>
-        prop.some((v) => v.toLowerCase().includes(lcQuery))
-      );
+      .filter(({ prop }) => prop.some((v) => v.toLowerCase().includes(lcQuery)));
 
     // If we have a single perfect match, them we remove the suggestions, and
     // we consider the user has selected a node through the datalist
@@ -357,26 +316,23 @@ function setSearchQuery2(state, graph, renderer, search_inputs) {
   let suggestions_author = undefined;
   state.query_label = query_label;
   state.query_author = query_author;
-  if (query_label !== "") {
+  if (query_label !== '') {
     const lcQuery = query_label.toLowerCase();
     suggestions_label = graph
       .nodes()
-      .map((n) => ({ id: n, prop: graph.getNodeAttribute(n, "label") }))
+      .map((n) => ({ id: n, prop: graph.getNodeAttribute(n, 'label') }))
       .filter(({ prop }) => prop.toLowerCase().includes(lcQuery));
     suggestions_label = new Set(suggestions_label.map(({ id }) => id));
   }
-  if (query_author !== "") {
+  if (query_author !== '') {
     const lcQuery = query_author.toLowerCase();
     suggestions_author = graph
       .nodes()
-      .map((n) => ({ id: n, prop: graph.getNodeAttribute(n, "author") }))
-      .filter(({ prop }) =>
-        prop.some((v) => v.toLowerCase().includes(lcQuery))
-      );
+      .map((n) => ({ id: n, prop: graph.getNodeAttribute(n, 'author') }))
+      .filter(({ prop }) => prop.some((v) => v.toLowerCase().includes(lcQuery)));
     suggestions_author = new Set(suggestions_author.map(({ id }) => id));
   }
-  if (suggestions_label && suggestions_author)
-    state.suggestions = suggestions_label.intersection(suggestions_author);
+  if (suggestions_label && suggestions_author) state.suggestions = suggestions_label.intersection(suggestions_author);
   else if (suggestions_label) state.suggestions = suggestions_label;
   else if (suggestions_author) state.suggestions = suggestions_author;
   else state.suggestions = undefined;
@@ -385,14 +341,7 @@ function setSearchQuery2(state, graph, renderer, search_inputs) {
   });
 }
 
-function setSearchQueryMulti(
-  state,
-  search_input,
-  property,
-  graph,
-  renderer,
-  search_inputs
-) {
+function setSearchQueryMulti(state, search_input, property, graph, renderer, search_inputs) {
   // function setSearchQuery(query, state, search_input, graph, renderer) {
   // state.searchQuery = query;
 
@@ -401,10 +350,10 @@ function setSearchQueryMulti(
   //     console.log(`${query} vs ${search_input.value}`);
   // }
   const suggestions_array = [undefined, undefined];
-  const properties = ["label", "author"];
+  const properties = ['label', 'author'];
   search_inputs.forEach((search_input, i) => {
     const query = search_input.value;
-    if (query !== "") {
+    if (query !== '') {
       const lcQuery = query.toLowerCase();
       const suggestions = graph
         .nodes()
@@ -444,11 +393,7 @@ function setSearchQueryMulti(
       // state.suggestions = undefined;
     }
   });
-  console.log(
-    `label: ${Boolean(suggestions_array[0])}, author: ${Boolean(
-      suggestions_array[1]
-    )}`
-  );
+  console.log(`label: ${Boolean(suggestions_array[0])}, author: ${Boolean(suggestions_array[1])}`);
   if (suggestions_array[0] && suggestions_array[1])
     state.suggestions = suggestions_array[0].union(suggestions_array[1]);
   else if (suggestions_array[0]) state.suggestions = suggestions_array[0];
@@ -466,36 +411,36 @@ function setSearchQueryMulti(
 
 function renderCard(nodeData) {
   // console.log(nodeData)
-  const cardContainer = document.querySelector(".card-container");
+  const cardContainer = document.querySelector('.card-container');
   // const buttonDiv = document.createElement("div");
 
-  cardContainer.style.display = "block";
+  cardContainer.style.display = 'block';
 
-  const closeButton = document.createElement("button");
-  closeButton.textContent = "✖";
-  closeButton.classList.add("close-button");
-  closeButton.addEventListener("click", () => {
-    cardContainer.style.display = "none";
+  const closeButton = document.createElement('button');
+  closeButton.textContent = '✖';
+  closeButton.classList.add('close-button');
+  closeButton.addEventListener('click', () => {
+    cardContainer.style.display = 'none';
   });
 
-  const abstract = nodeData.abstract
-    ? nodeData.abstract
-    : "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed sit amet nulla auctor, vestibulum magna sed, convallis ex. Cum sociis natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus.";
-  const link = nodeData.doi ? nodeData.doi : "www.google.com";
+  const abstract = nodeData.abstract ? nodeData.abstract : 'No abstract available';
+  // : "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed sit amet nulla auctor, vestibulum magna sed, convallis ex. Cum sociis natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus.";
   // <p>Authors: ${nodeData.author.join(', ')}</p>
   const cardHTML = `
     <div class="close-button-card"></div>
     <div class="card-contents">
       <h3>${nodeData.label}</h3>
-      <p>Authors: ${nodeData.author.join(", ")}</p>
+      <p>Authors: ${nodeData.author.join(', ')}</p>
       <p>Abstract: ${abstract}</p>
       <p>Year: ${nodeData.date}</p>
+      <p>Journal: ${nodeData.journal}</p>
       <p>Citations: ${nodeData.citationcount}</p>
-      <p>Link: <a href="${nodeData.link}">${nodeData.link}</a></p>
+      <p>Link: <a href="https://doi.org/${nodeData.doi}" target="_blank">doi.org/${nodeData.doi}</a></p>
+      <p>DOI: ${nodeData.doi}</p>
     </div>
   `;
   cardContainer.innerHTML = cardHTML;
-  const buttonDiv = document.querySelector(".close-button-card");
+  const buttonDiv = document.querySelector('.close-button-card');
   buttonDiv.appendChild(closeButton);
   // cardContainer.appendChild(buttonDiv);
 }
