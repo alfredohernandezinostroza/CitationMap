@@ -62,10 +62,18 @@ function render_gexf(graph, state) {
   const search_container = document.getElementById('search-container');
   const search_inputs = search_container.querySelectorAll('input[type="search"]');
   console.log(search_inputs);
+
   const search_input_label = document.getElementById('search-input-label');
   const search_input_author = document.getElementById('search-input-author');
+  const search_input_keywords = document.getElementById('search-input-keywords');
+  const search_input_journal = document.getElementById('search-input-journal');
+  const search_input_abstract = document.getElementById('search-input-abstract');
+
   const search_suggestions_label = document.getElementById('suggestions-label');
   const search_suggestions_author = document.getElementById('suggestions-author');
+  const search_suggestions_keywords = document.getElementById('suggestions-keywords');
+  const search_suggestions_journal = document.getElementById('suggestions-journal');
+  const search_suggestions_abstract = document.getElementById('suggestions-abstract');
 
   // Feed the datalist autocomplete values:
   search_suggestions_label.innerHTML = graph
