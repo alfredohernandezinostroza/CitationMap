@@ -1,10 +1,8 @@
 // Import libraries from ES modules CDN (skypack, unpkg or esm.sh)
 import Graph from 'https://cdn.skypack.dev/graphology';
 import { parse } from 'https://cdn.skypack.dev/graphology-gexf/browser';
-import Sigma from 'https://cdn.skypack.dev/sigma';
-// import Sigma from "https://cdnjs.cloudflare.com/ajax/libs/sigma.js/3.0.1/sigma.min.js"
-// import {Sigma} from "https://cdnjs.cloudflare.com/ajax/libs/sigma.js/3.0.0/sigma.min.js"
-// <script src="https://cdnjs.cloudflare.com/ajax/libs/graphology/[VERSION]/graphology.umd.min.js"></script>
+import { fitViewportToNodes } from './utils.js';
+// import Sigma from 'https://cdn.skypack.dev/sigma';
 
 // Load and render the GEXF file
 const graph = await load_gexf();
@@ -103,7 +101,7 @@ function render_gexf(graph, state) {
     });
   }
   // Instantiate sigma with custom settings for labels
-  const renderer = new Sigma(graph, sigma_container, {
+  const renderer = new window.Sigma(graph, sigma_container, {
     minCameraRatio: 0.08,
     maxCameraRatio: 3,
     renderLabels: false,
@@ -336,6 +334,8 @@ function setSearchQuery2(state, graph, renderer, search_inputs) {
   else if (suggestions_label) state.suggestions = suggestions_label;
   else if (suggestions_author) state.suggestions = suggestions_author;
   else state.suggestions = undefined;
+  if (state.suggestions) fitViewportToNodes(renderer, Array.from(state.suggestions), { animate: true });
+
   renderer.refresh({
     skipIndexation: true,
   });
@@ -442,5 +442,4 @@ function renderCard(nodeData) {
   cardContainer.innerHTML = cardHTML;
   const buttonDiv = document.querySelector('.close-button-card');
   buttonDiv.appendChild(closeButton);
-  // cardContainer.appendChild(buttonDiv);
 }

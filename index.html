@@ -6,7 +6,7 @@
     <title>Graph Visualization</title>
     <style>
       body {
-        font-family: "Arial", sans-serif;
+        font-family: 'Arial', sans-serif;
         margin: 0;
         padding: 0;
         display: flex;
@@ -87,27 +87,18 @@
     <div id="sigma-container"></div>
     <div id="search-container">
       <div id="search">
-        <input
-          type="search"
-          id="search-input"
-          list="suggestions"
-          placeholder="Try searching for a node..."
-        />
+        <input type="search" id="search-input" list="suggestions" placeholder="Try searching for a node..." />
         <datalist id="suggestions"></datalist>
       </div>
       <div id="search-2">
-        <input
-          type="search"
-          id="search-input-2"
-          list="suggestions-2"
-          placeholder="Try searching for an author..."
-        />
+        <input type="search" id="search-input-2" list="suggestions-2" placeholder="Try searching for an author..." />
         <datalist id="suggestions-2"></datalist>
       </div>
     </div>
 
     <div class="card-container" style="display: none"></div>
     <!-- Use ES module imports directly in the browser -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/sigma.js/3.0.1/sigma.min.js"></script>
     <script type="module" src="app.js"></script>
   </body>
 </html>
