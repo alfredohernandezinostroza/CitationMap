@@ -6,6 +6,9 @@ import { fitViewportToNodes } from './utils.js';
 
 // Load and render the GEXF file
 const graph = await load_gexf();
+console.log(graph.getNodeAttribute(4959, 'abstract'));
+clean_graph(graph);
+console.log(graph.getNodeAttribute(4959, 'abstract'));
 let renderer = null;
 
 // Define state for hover interactions
@@ -48,6 +51,17 @@ async function load_gexf() {
 
   const graph = parse(Graph, to_parse);
   return graph;
+}
+
+function clean_graph(graph) {
+  graph.forEachNode((node) => {
+    if (!graph.hasNodeAttribute(node, 'abstract')) {
+      graph.setNodeAttribute(node, 'abstract', '');
+    }
+    if (!graph.hasNodeAttribute(node, 'keywords')) {
+      graph.setNodeAttribute(node, 'keywords', []);
+    }
+  });
 }
 
 function render_gexf(graph, state) {
@@ -137,10 +151,19 @@ function render_gexf(graph, state) {
 
   // Bind search input interactions:
   search_input_label.addEventListener('input', () => {
-    setSearchQuery2(state, graph, renderer, search_inputs);
+    setSearchQuery3(state, graph, renderer, search_inputs);
   });
   search_input_author.addEventListener('input', () => {
-    setSearchQuery2(state, graph, renderer, search_inputs);
+    setSearchQuery3(state, graph, renderer, search_inputs);
+  });
+  search_input_abstract.addEventListener('input', () => {
+    setSearchQuery3(state, graph, renderer, search_inputs);
+  });
+  search_input_journal.addEventListener('input', () => {
+    setSearchQuery3(state, graph, renderer, search_inputs);
+  });
+  search_input_keywords.addEventListener('input', () => {
+    setSearchQuery3(state, graph, renderer, search_inputs);
   });
   // search_input.addEventListener("blur", () => {
   //   setSearchQuery("", state, search_input, graph, renderer);
@@ -420,10 +443,17 @@ function setSearchQuery3(state, graph, renderer, search_inputs) {
       .filter(({ prop }) => prop.some((v) => v.toLowerCase().includes(lcQuery)));
     suggestions_keywords = new Set(suggestions_keywords.map(({ id }) => id));
   }
-  if (suggestions_label && suggestions_author) state.suggestions = suggestions_label.intersection(suggestions_author);
-  else if (suggestions_label) state.suggestions = suggestions_label;
-  else if (suggestions_author) state.suggestions = suggestions_author;
-  else state.suggestions = undefined;
+  const definedSuggestions = [
+    suggestions_label,
+    suggestions_author,
+    suggestions_abstract,
+    suggestions_journal,
+    suggestions_keywords,
+  ].filter(Boolean);
+  state.suggestions = definedSuggestions.reduce(
+    (acc, suggestion) => acc.intersection(suggestion),
+    definedSuggestions[0],
+  );
   if (state.suggestions) fitViewportToNodes(renderer, Array.from(state.suggestions), { animate: true });
 
   renderer.refresh({
