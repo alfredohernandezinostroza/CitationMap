@@ -86,6 +86,21 @@ function render_gexf(graph, state) {
     .map((node) => `<option value="${graph.getNodeAttribute(node, 'author')}"></option>`)
     .join('\n');
 
+  search_suggestions_keywords.innerHTML = graph
+    .nodes()
+    .map((node) => `<option value="${graph.getNodeAttribute(node, 'keywords')}"></option>`)
+    .join('\n');
+
+  search_suggestions_journal.innerHTML = graph
+    .nodes()
+    .map((node) => `<option value="${graph.getNodeAttribute(node, 'journal')}"></option>`)
+    .join('\n');
+
+  search_suggestions_abstract.innerHTML = graph
+    .nodes()
+    .map((node) => `<option value="${graph.getNodeAttribute(node, 'abstract')}"></option>`)
+    .join('\n');
+
   // Function to handle hover state
   function setHoveredNode(node) {
     if (
@@ -336,6 +351,74 @@ function setSearchQuery2(state, graph, renderer, search_inputs) {
       .map((n) => ({ id: n, prop: graph.getNodeAttribute(n, 'author') }))
       .filter(({ prop }) => prop.some((v) => v.toLowerCase().includes(lcQuery)));
     suggestions_author = new Set(suggestions_author.map(({ id }) => id));
+  }
+  const definedSuggestions = [suggestions_label, suggestions_author].filter(Boolean);
+  state.suggestions = definedSuggestions.reduce(
+    (acc, suggestion) => acc.intersection(suggestion),
+    definedSuggestions[0],
+  );
+  if (state.suggestions) fitViewportToNodes(renderer, Array.from(state.suggestions), { animate: true });
+
+  renderer.refresh({
+    skipIndexation: true,
+  });
+}
+
+function setSearchQuery3(state, graph, renderer, search_inputs) {
+  const query_label = search_inputs[0].value;
+  const query_author = search_inputs[1].value;
+  const query_abstract = search_inputs[2].value;
+  const query_journal = search_inputs[3].value;
+  const query_keywords = search_inputs[4].value;
+  let suggestions_label = undefined;
+  let suggestions_author = undefined;
+  let suggestions_abstract = undefined;
+  let suggestions_journal = undefined;
+  let suggestions_keywords = undefined;
+  state.query_label = query_label;
+  state.query_author = query_author;
+  state.query_abstract = query_abstract;
+  state.query_journal = query_journal;
+  state.query_keywords = query_keywords;
+  if (query_label !== '') {
+    const lcQuery = query_label.toLowerCase();
+    suggestions_label = graph
+      .nodes()
+      .map((n) => ({ id: n, prop: graph.getNodeAttribute(n, 'label') }))
+      .filter(({ prop }) => prop.toLowerCase().includes(lcQuery));
+    suggestions_label = new Set(suggestions_label.map(({ id }) => id));
+  }
+  if (query_author !== '') {
+    const lcQuery = query_author.toLowerCase();
+    suggestions_author = graph
+      .nodes()
+      .map((n) => ({ id: n, prop: graph.getNodeAttribute(n, 'author') }))
+      .filter(({ prop }) => prop.some((v) => v.toLowerCase().includes(lcQuery)));
+    suggestions_author = new Set(suggestions_author.map(({ id }) => id));
+  }
+  if (query_abstract !== '') {
+    const lcQuery = query_abstract.toLowerCase();
+    suggestions_abstract = graph
+      .nodes()
+      .map((n) => ({ id: n, prop: graph.getNodeAttribute(n, 'abstract') }))
+      .filter(({ prop }) => prop.toLowerCase().includes(lcQuery));
+    suggestions_abstract = new Set(suggestions_abstract.map(({ id }) => id));
+  }
+  if (query_journal !== '') {
+    const lcQuery = query_journal.toLowerCase();
+    suggestions_journal = graph
+      .nodes()
+      .map((n) => ({ id: n, prop: graph.getNodeAttribute(n, 'journal') }))
+      .filter(({ prop }) => prop.toLowerCase().includes(lcQuery));
+    suggestions_journal = new Set(suggestions_journal.map(({ id }) => id));
+  }
+  if (query_keywords !== '') {
+    const lcQuery = query_keywords.toLowerCase();
+    suggestions_keywords = graph
+      .nodes()
+      .map((n) => ({ id: n, prop: graph.getNodeAttribute(n, 'keywords') }))
+      .filter(({ prop }) => prop.some((v) => v.toLowerCase().includes(lcQuery)));
+    suggestions_keywords = new Set(suggestions_keywords.map(({ id }) => id));
   }
   if (suggestions_label && suggestions_author) state.suggestions = suggestions_label.intersection(suggestions_author);
   else if (suggestions_label) state.suggestions = suggestions_label;
