@@ -62,19 +62,18 @@ function render_gexf(graph, state) {
   const search_container = document.getElementById('search-container');
   const search_inputs = search_container.querySelectorAll('input[type="search"]');
   console.log(search_inputs);
-  const search_input = document.getElementById('search-input');
-  const search_input_2 = document.getElementById('search-input-2');
-  console.log(search_input === search_inputs[0], search_input_2 === search_inputs[1]);
-  const search_suggestions = document.getElementById('suggestions');
-  const search_suggestions_2 = document.getElementById('suggestions-2');
+  const search_input_label = document.getElementById('search-input-label');
+  const search_input_author = document.getElementById('search-input-author');
+  const search_suggestions_label = document.getElementById('suggestions-label');
+  const search_suggestions_author = document.getElementById('suggestions-author');
 
   // Feed the datalist autocomplete values:
-  search_suggestions.innerHTML = graph
+  search_suggestions_label.innerHTML = graph
     .nodes()
     .map((node) => `<option value="${graph.getNodeAttribute(node, 'label')}"></option>`)
     .join('\n');
 
-  search_suggestions_2.innerHTML = graph
+  search_suggestions_author.innerHTML = graph
     .nodes()
     .map((node) => `<option value="${graph.getNodeAttribute(node, 'author')}"></option>`)
     .join('\n');
@@ -114,10 +113,10 @@ function render_gexf(graph, state) {
   });
 
   // Bind search input interactions:
-  search_input.addEventListener('input', () => {
+  search_input_label.addEventListener('input', () => {
     setSearchQuery2(state, graph, renderer, search_inputs);
   });
-  search_input_2.addEventListener('input', () => {
+  search_input_author.addEventListener('input', () => {
     setSearchQuery2(state, graph, renderer, search_inputs);
   });
   // search_input.addEventListener("blur", () => {
