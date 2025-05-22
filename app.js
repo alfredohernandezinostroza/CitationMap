@@ -61,6 +61,11 @@ function clean_graph(graph) {
     if (!graph.hasNodeAttribute(node, 'keywords')) {
       graph.setNodeAttribute(node, 'keywords', []);
     }
+    if (graph.hasNodeAttribute(node, 'date')) {
+      graph.setNodeAttribute(node, 'date', parse_year(graph.getNodeAttribute(node, 'date')));
+    } else {
+      graph.setNodeAttribute(node, 'date', 'undefined');
+    }
   });
 }
 
@@ -74,7 +79,7 @@ function render_gexf(graph, state) {
   // Retrieve container element
   const sigma_container = document.getElementById('sigma-container');
   const search_container = document.getElementById('search-container');
-  const search_inputs = search_container.querySelectorAll('input[type="search"]');
+  const search_inputs = Array.from(search_container.querySelectorAll('input[type="search"]'));
   console.log(search_inputs);
 
   const search_input_label = document.getElementById('search-input-label');
@@ -82,6 +87,11 @@ function render_gexf(graph, state) {
   const search_input_keywords = document.getElementById('search-input-keywords');
   const search_input_journal = document.getElementById('search-input-journal');
   const search_input_abstract = document.getElementById('search-input-abstract');
+
+  const minYearThresholdRange = document.getElementById('year-min-threshold');
+  const maxYearThresholdRange = document.getElementById('year-max-threshold');
+  search_inputs.push(minYearThresholdRange);
+  search_inputs.push(maxYearThresholdRange);
 
   const search_suggestions_label = document.getElementById('suggestions-label');
   const search_suggestions_author = document.getElementById('suggestions-author');
@@ -151,23 +161,34 @@ function render_gexf(graph, state) {
 
   // Bind search input interactions:
   search_input_label.addEventListener('input', () => {
-    setSearchQuery3(state, graph, renderer, search_inputs);
+    setSearchQuery4(state, graph, renderer, search_inputs);
   });
   search_input_author.addEventListener('input', () => {
-    setSearchQuery3(state, graph, renderer, search_inputs);
+    setSearchQuery4(state, graph, renderer, search_inputs);
   });
   search_input_abstract.addEventListener('input', () => {
-    setSearchQuery3(state, graph, renderer, search_inputs);
+    setSearchQuery4(state, graph, renderer, search_inputs);
   });
   search_input_journal.addEventListener('input', () => {
-    setSearchQuery3(state, graph, renderer, search_inputs);
+    setSearchQuery4(state, graph, renderer, search_inputs);
   });
   search_input_keywords.addEventListener('input', () => {
-    setSearchQuery3(state, graph, renderer, search_inputs);
+    setSearchQuery4(state, graph, renderer, search_inputs);
   });
-  // search_input.addEventListener("blur", () => {
-  //   setSearchQuery("", state, search_input, graph, renderer);
-  // });
+
+  // Bind labels threshold to range input
+  minYearThresholdRange.addEventListener('input', () => {
+    setSearchQuery4(state, graph, renderer, search_inputs);
+    // renderer?.setSetting('labelRenderedSizeThreshold', +labelsThresholdRange.value);
+  });
+  maxYearThresholdRange.addEventListener('input', () => {
+    setSearchQuery4(state, graph, renderer, search_inputs);
+    // renderer?.setSetting('labelRenderedSizeThreshold', +labelsThresholdRange.value);
+  });
+
+  // Set proper range initial value:
+  minYearThresholdRange.value = '1900';
+  maxYearThresholdRange.value = '2025';
 
   try {
     bind_graph_interactions2(renderer, state);
@@ -485,6 +506,99 @@ function setSearchQuery3(state, graph, renderer, search_inputs) {
   });
 }
 
+function setSearchQuery4(state, graph, renderer, search_inputs) {
+  const query_label = search_inputs[0].value;
+  const query_author = search_inputs[1].value;
+  const query_abstract = search_inputs[2].value;
+  const query_journal = search_inputs[3].value;
+  const query_keywords = search_inputs[4].value;
+  const min_year_value = +search_inputs[5].value; //convert to int
+  const max_year_value = +search_inputs[6].value; //convert to int
+  let suggestions_label = undefined;
+  let suggestions_author = undefined;
+  let suggestions_abstract = undefined;
+  let suggestions_journal = undefined;
+  let suggestions_keywords = undefined;
+  state.query_label = query_label;
+  state.query_author = query_author;
+  state.query_abstract = query_abstract;
+  state.query_journal = query_journal;
+  state.query_keywords = query_keywords;
+  if (query_label !== '') {
+    const lcQuery = query_label.toLowerCase();
+    suggestions_label = graph
+      .nodes()
+      .map((n) => ({ id: n, prop: graph.getNodeAttribute(n, 'label') }))
+      .filter(({ prop }) => prop.toLowerCase().includes(lcQuery));
+    suggestions_label = new Set(suggestions_label.map(({ id }) => id));
+  }
+  if (query_author !== '') {
+    const queries = query_author.split(',');
+    suggestions_author = new Set();
+    queries.forEach((query) => {
+      const lcQuery = query.toLowerCase();
+      let suggestions = graph
+        .nodes()
+        .map((n) => ({ id: n, array_prop: graph.getNodeAttribute(n, 'author') }))
+        .filter(({ array_prop }) => array_prop.some((v) => v.toLowerCase().includes(lcQuery)));
+      suggestions_author = suggestions_author.union(new Set(suggestions.map(({ id }) => id)));
+    });
+  }
+  if (query_abstract !== '') {
+    const lcQuery = query_abstract.toLowerCase();
+    suggestions_abstract = graph
+      .nodes()
+      .map((n) => ({ id: n, prop: graph.getNodeAttribute(n, 'abstract') }))
+      .filter(({ prop }) => prop.toLowerCase().includes(lcQuery));
+    suggestions_abstract = new Set(suggestions_abstract.map(({ id }) => id));
+  }
+  if (query_journal !== '') {
+    const lcQuery = query_journal.toLowerCase();
+    suggestions_journal = graph
+      .nodes()
+      .map((n) => ({ id: n, prop: graph.getNodeAttribute(n, 'journal') }))
+      .filter(({ prop }) => prop.toLowerCase().includes(lcQuery));
+    suggestions_journal = new Set(suggestions_journal.map(({ id }) => id));
+  }
+  if (query_keywords !== '') {
+    const queries = query_keywords.split(',');
+    suggestions_keywords = new Set();
+    queries.forEach((query) => {
+      const lcQuery = query.toLowerCase();
+      let suggestions = graph
+        .nodes()
+        .map((n) => ({ id: n, array_prop: graph.getNodeAttribute(n, 'keywords') }))
+        .filter(({ array_prop }) => array_prop.some((v) => v.toLowerCase().includes(lcQuery)));
+      suggestions_keywords = suggestions_keywords.union(new Set(suggestions.map(({ id }) => id)));
+    });
+  }
+  let year_nodes = graph
+    .nodes()
+    .map((n) => ({ id: n, year: graph.getNodeAttribute(n, 'date') }))
+    .filter(({ year }) => (year ? +year >= min_year_value && +year <= max_year_value : false));
+  year_nodes = new Set(year_nodes.map(({ id }) => id));
+  const definedSuggestions = [
+    suggestions_label,
+    suggestions_author,
+    suggestions_abstract,
+    suggestions_journal,
+    suggestions_keywords,
+    year_nodes,
+  ].filter(Boolean);
+  state.suggestions = definedSuggestions.reduce(
+    (acc, suggestion) => acc.intersection(suggestion),
+    definedSuggestions[0],
+  );
+
+  document.getElementById('label-min-threshold').innerHTML = `Min year: ${search_inputs[5].value}`;
+  document.getElementById('label-max-threshold').innerHTML = `Max year: ${search_inputs[6].value}`;
+  if (state.suggestions) fitViewportToNodes(renderer, Array.from(state.suggestions), { animate: true });
+
+  renderer.refresh({
+    skipIndexation: true,
+  });
+}
+
 function setSearchQueryMulti(state, search_input, property, graph, renderer, search_inputs) {
   // function setSearchQuery(query, state, search_input, graph, renderer) {
   // state.searchQuery = query;
@@ -587,4 +701,17 @@ function renderCard(nodeData) {
   cardContainer.innerHTML = cardHTML;
   const buttonDiv = document.querySelector('.close-button-card');
   buttonDiv.appendChild(closeButton);
+}
+
+function parse_year(year) {
+  if (year === undefined) {
+    return 'undefined';
+  }
+  if (year.length > 0 && !isNaN(year[0])) {
+    console.log(year.substring(0, 4));
+    return year.substring(0, 4);
+  } else {
+    console.log(year.substring(year.length - 4));
+    return year.substring(year.length - 4);
+  }
 }

@@ -132,7 +132,12 @@
         <datalist id="suggestions-keywords"></datalist>
       </div>
     </div>
-
+    <div class="input-years">
+      <label for="year-min-threshold" id="label-min-threshold">Min year: 1900</label>
+      <input id="year-min-threshold" type="range" min="1900" max="2025" step="1" />
+      <label for="year-max-threshold" id="label-max-threshold">Max year: 2025</label>
+      <input id="year-max-threshold" type="range" min="1900" max="2025" step="1" />
+    </div>
     <div class="card-container" style="display: none"></div>
     <!-- Use ES module imports directly in the browser -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/sigma.js/3.0.1/sigma.min.js"></script>
