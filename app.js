@@ -6,11 +6,41 @@ import { fitViewportToNodes } from './utils.js';
 
 // Load and render the GEXF file
 const graph = await load_gexf();
-console.log(graph.getNodeAttribute(4959, 'abstract'));
 clean_graph(graph);
-console.log(graph.getNodeAttribute(4959, 'abstract'));
 let renderer = null;
 
+// const tabButtons = document.querySelectorAll('.tab-button');
+// const tabPanes = document.querySelectorAll('.tab-pane');
+// console.log(tabButtons);
+// console.log(tabPanes);
+
+// tabButtons.forEach((button, index) => {
+//   button.addEventListener('click', () => {
+//     console.log(`removed active class from button ${index}`);
+//     tabButtons.forEach((button) => button.classList.remove('active'));
+//     button.classList.add('active');
+//     tabPanes.forEach((pane) => pane.classList.remove('active'));
+//     tabPanes[index].classList.add('active');
+//   });
+// });
+const tabButton1 = document.getElementById('tab-button-1');
+const tabButton2 = document.getElementById('tab-button-2');
+const tabPane1 = document.getElementById('tab-pane-1');
+const tabPane2 = document.getElementById('tab-pane-2');
+
+tabButton1.addEventListener('click', () => {
+  tabButton1.classList.add('active');
+  tabButton2.classList.remove('active');
+  tabPane1.classList.add('active');
+  tabPane2.classList.remove('active');
+});
+
+tabButton2.addEventListener('click', () => {
+  tabButton1.classList.remove('active');
+  tabButton2.classList.add('active');
+  tabPane1.classList.remove('active');
+  tabPane2.classList.add('active');
+});
 // Define state for hover interactions
 const state = {
   hoveredNode: undefined,

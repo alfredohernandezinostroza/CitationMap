@@ -24,6 +24,7 @@
         flex: 1;
         position: relative;
         overflow: hidden;
+        height: 50vh;
       }
 
       .card-container {
@@ -77,6 +78,46 @@
         font-size: 18px;
         cursor: pointer; */
       }
+
+      .tabs {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+      }
+
+      .tab-header {
+        display: flex;
+        justify-content: space-between;
+        border-bottom: 1px solid #ccc;
+      }
+
+      .tab-button {
+        padding: 10px 20px;
+        border: none;
+        border-radius: 5px 5px 0 0;
+        background-color: #f0f0f0;
+        cursor: pointer;
+      }
+
+      .tab-button.active {
+        background-color: #ccc;
+      }
+
+      .tab-content {
+        padding: 20px;
+      }
+
+      .tab-pane {
+        display: none;
+      }
+
+      .tab-pane.active {
+        display: block;
+      }
+
+      .tab-pane:not(.active) {
+        display: none;
+      }
     </style>
   </head>
   <body>
@@ -84,63 +125,75 @@
       <h1>Motor Learning AAA</h1>
     </div>
 
-    <div id="sigma-container"></div>
-    <div id="search-container">
-      <div id="search">
-        <input
-          type="search"
-          id="search-input-label"
-          list="suggestions-label"
-          placeholder="Try searching for a node..."
-        />
-        <datalist id="suggestions-label"></datalist>
+    <div class="tabs">
+      <div class="tab-header">
+        <button class="tab-button active" id="tab-button-1">Graph</button>
+        <button class="tab-button" id="tab-button-2">Table</button>
       </div>
-      <div id="search-author">
-        <input
-          type="search"
-          id="search-input-author"
-          list="suggestions-author"
-          placeholder="Try searching for an author..."
-        />
-        <datalist id="suggestions-author"></datalist>
-      </div>
-      <div id="search-abstract">
-        <input
-          type="search"
-          id="search-input-abstract"
-          list="suggestions-abstract"
-          placeholder="Try searching in the abstracts..."
-        />
-        <datalist id="suggestions-abstract"></datalist>
-      </div>
-      <div id="search-journal">
-        <input
-          type="search"
-          id="search-input-journal"
-          list="suggestions-journal"
-          placeholder="Try searching for a journal..."
-        />
-        <datalist id="suggestions-journal"></datalist>
-      </div>
-      <div id="search-keywords">
-        <input
-          type="search"
-          id="search-input-keywords"
-          list="suggestions-keywords"
-          placeholder="Try searching in the keywords..."
-        />
-        <datalist id="suggestions-keywords"></datalist>
+      <div class="tab-content">
+        <div class="tab-pane active" id="tab-pane-1">
+          <div id="sigma-container"></div>
+          <div id="search-container">
+            <div id="search">
+              <input
+                type="search"
+                id="search-input-label"
+                list="suggestions-label"
+                placeholder="Try searching for a node..."
+              />
+              <datalist id="suggestions-label"></datalist>
+            </div>
+            <div id="search-author">
+              <input
+                type="search"
+                id="search-input-author"
+                list="suggestions-author"
+                placeholder="Try searching for an author..."
+              />
+              <datalist id="suggestions-author"></datalist>
+            </div>
+            <div id="search-abstract">
+              <input
+                type="search"
+                id="search-input-abstract"
+                list="suggestions-abstract"
+                placeholder="Try searching in the abstracts..."
+              />
+              <datalist id="suggestions-abstract"></datalist>
+            </div>
+            <div id="search-journal">
+              <input
+                type="search"
+                id="search-input-journal"
+                list="suggestions-journal"
+                placeholder="Try searching for a journal..."
+              />
+              <datalist id="suggestions-journal"></datalist>
+            </div>
+            <div id="search-keywords">
+              <input
+                type="search"
+                id="search-input-keywords"
+                list="suggestions-keywords"
+                placeholder="Try searching in the keywords..."
+              />
+              <datalist id="suggestions-keywords"></datalist>
+            </div>
+          </div>
+          <div class="input-years">
+            <label for="year-min-threshold" id="label-min-threshold">Min year: 1900</label>
+            <input id="year-min-threshold" type="range" min="1900" max="2025" step="1" />
+            <label for="year-max-threshold" id="label-max-threshold">Max year: 2025</label>
+            <input id="year-max-threshold" type="range" min="1900" max="2025" step="1" />
+          </div>
+          <div class="card-container" style="display: none"></div>
+        </div>
+        <div class="tab-pane" id="tab-pane-2">
+          <h1>Table</h1>
+        </div>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/sigma.js/3.0.1/sigma.min.js"></script>
+        <script type="module" src="app.js"></script>
       </div>
     </div>
-    <div class="input-years">
-      <label for="year-min-threshold" id="label-min-threshold">Min year: 1900</label>
-      <input id="year-min-threshold" type="range" min="1900" max="2025" step="1" />
-      <label for="year-max-threshold" id="label-max-threshold">Max year: 2025</label>
-      <input id="year-max-threshold" type="range" min="1900" max="2025" step="1" />
-    </div>
-    <div class="card-container" style="display: none"></div>
-    <!-- Use ES module imports directly in the browser -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/sigma.js/3.0.1/sigma.min.js"></script>
-    <script type="module" src="app.js"></script>
   </body>
 </html>
