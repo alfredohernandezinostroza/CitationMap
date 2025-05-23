@@ -5,6 +5,7 @@ body {
   display: flex;
   flex-direction: column;
   height: 100vh;
+  margin-bottom: 0;
 }
 .header {
   padding: 0.5rem;
@@ -16,8 +17,9 @@ body {
   flex: 1;
   position: relative;
   overflow: hidden;
-  height: 55vh;
+  height: 80vh;
   width: 100vw;
+  z-index: 1;
 }
 
 .card-container {
@@ -140,10 +142,13 @@ body {
 }
 #global-filters {
   position: fixed;
-  bottom: 3vh; /* adjust this value */
+  bottom: 0; /* adjust this value */
   left: 0;
   width: 100%;
   background-color: #fff; /* optional */
   padding: 10px; /* optional */
+  /* padding-bottom: 200px; */
+  margin-bottom: 0;
   border-top: 1px solid #ccc; /* optional */
+  z-index: 2;
 }
