@@ -44,24 +44,6 @@ let renderer = null;
 //     tabPanes[index].classList.add('active');
 //   });
 // });
-const tabButton1 = document.getElementById('tab-button-1');
-const tabButton2 = document.getElementById('tab-button-2');
-const tabPane1 = document.getElementById('tab-pane-1');
-const tabPane2 = document.getElementById('tab-pane-2');
-
-tabButton1.addEventListener('click', () => {
-  tabButton1.classList.add('active');
-  tabButton2.classList.remove('active');
-  tabPane1.classList.add('active');
-  tabPane2.classList.remove('active');
-});
-
-tabButton2.addEventListener('click', () => {
-  tabButton1.classList.remove('active');
-  tabButton2.classList.add('active');
-  tabPane1.classList.remove('active');
-  tabPane2.classList.add('active');
-});
 // Define state for hover interactions
 const state = {
   hoveredNode: undefined,
@@ -74,10 +56,11 @@ const state = {
 };
 
 try {
-  renderer = render_gexf(graph, state); //.catch(error => console.error('Error rendering gexf', error));
+  renderer = await render_gexf(graph, state); //.catch(error => console.error('Error rendering gexf', error));
 } catch (error) {
   console.error('Error rendering gexf', error);
 }
+// fitViewportToNodes(renderer, graph.nodes(), { animate: true });
 
 async function load_gexf() {
   let renderer = null;
@@ -126,7 +109,7 @@ function clean_graph(graph) {
   });
 }
 
-function render_gexf(graph, state) {
+async function render_gexf(graph, state) {
   // Clean up previous renderer if it exists
   // if (renderer) {
   //   renderer.kill();
@@ -829,6 +812,25 @@ async function create_table() {
     papersTable.on('tableBuilt', () => {
       resolve();
     });
+  });
+
+  const tabButton1 = document.getElementById('tab-button-1');
+  const tabButton2 = document.getElementById('tab-button-2');
+  const tabPane1 = document.getElementById('tab-pane-1');
+  const tabPane2 = document.getElementById('tab-pane-2');
+
+  tabButton1.addEventListener('click', () => {
+    tabButton1.classList.add('active');
+    tabButton2.classList.remove('active');
+    tabPane1.classList.add('active');
+    tabPane2.classList.remove('active');
+  });
+
+  tabButton2.addEventListener('click', () => {
+    tabButton1.classList.remove('active');
+    tabButton2.classList.add('active');
+    tabPane1.classList.remove('active');
+    tabPane2.classList.add('active');
   });
 
   // console.log(`formatter: ${papersTable.getColumnDefinition('Citations').formatter}`);
