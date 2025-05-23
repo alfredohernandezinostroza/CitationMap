@@ -1,12 +1,33 @@
 // Import libraries from ES modules CDN (skypack, unpkg or esm.sh)
-import Graph from 'https://cdn.skypack.dev/graphology';
+// import Graph from 'https://cdn.skypack.dev/graphology';
 import { parse } from 'https://cdn.skypack.dev/graphology-gexf/browser';
 import { fitViewportToNodes } from './utils.js';
+import { clearFilters, updateFilter } from './table.js';
 // import Sigma from 'https://cdn.skypack.dev/sigma';
 
 // Load and render the GEXF file
 const graph = await load_gexf();
 clean_graph(graph);
+const papersTable = await create_table();
+// papersTable.getColumnDefinition("Citations")
+
+//Update filters on value change
+document.getElementById('filter-field').addEventListener('change', () => {
+  updateFilter(papersTable);
+});
+document.getElementById('filter-type').addEventListener('change', () => {
+  updateFilter(papersTable);
+});
+document.getElementById('filter-value').addEventListener('keyup', () => {
+  updateFilter(papersTable);
+});
+
+//Clear filters on "Clear Filters" button click
+document.getElementById('filter-clear').addEventListener('click', () => {
+  clearFilters(papersTable);
+});
+// papersTable.setData(data_for_table);
+
 let renderer = null;
 
 // const tabButtons = document.querySelectorAll('.tab-button');
@@ -79,7 +100,7 @@ async function load_gexf() {
     loadingIndicator.style.display = 'none';
   }, 4000);
 
-  const graph = parse(Graph, to_parse);
+  const graph = parse(window.graphology, to_parse);
   return graph;
 }
 
@@ -90,6 +111,12 @@ function clean_graph(graph) {
     }
     if (!graph.hasNodeAttribute(node, 'keywords')) {
       graph.setNodeAttribute(node, 'keywords', []);
+    }
+    if (!graph.hasNodeAttribute(node, 'citationcount')) {
+      graph.setNodeAttribute(node, 'citationcount', parseInt(graph.getNodeAttribute(node, 'citationcount')));
+    }
+    if (!graph.hasNodeAttribute(node, 'link')) {
+      graph.setNodeAttribute(node, 'link', `https://doi.org/${graph.getNodeAttribute(node, 'doi')}`);
     }
     if (graph.hasNodeAttribute(node, 'date')) {
       graph.setNodeAttribute(node, 'date', parse_year(graph.getNodeAttribute(node, 'date')));
@@ -110,7 +137,6 @@ function render_gexf(graph, state) {
   const sigma_container = document.getElementById('sigma-container');
   const search_container = document.getElementById('search-container');
   const search_inputs = Array.from(search_container.querySelectorAll('input[type="search"]'));
-  console.log(search_inputs);
 
   const search_input_label = document.getElementById('search-input-label');
   const search_input_author = document.getElementById('search-input-author');
@@ -187,6 +213,7 @@ function render_gexf(graph, state) {
     defaultEdgeColor: '#e0e0e0',
     zIndex: true,
     enableHovering: false,
+    allowInvalidContainer: true,
   });
 
   // Bind search input interactions:
@@ -624,6 +651,15 @@ function setSearchQuery4(state, graph, renderer, search_inputs) {
   document.getElementById('label-max-threshold').innerHTML = `Max year: ${search_inputs[6].value}`;
   if (state.suggestions) fitViewportToNodes(renderer, Array.from(state.suggestions), { animate: true });
 
+  let new_table_data = graph.toJSON().nodes.filter((node) => state.suggestions.has(node.key));
+  new_table_data = new_table_data.map((obj) => {
+    let res = { ...obj, ...obj.attributes };
+    delete res.attributes;
+    return res;
+  });
+  console.log(new_table_data);
+  papersTable.replaceData(new_table_data);
+
   renderer.refresh({
     skipIndexation: true,
   });
@@ -653,7 +689,6 @@ function setSearchQueryMulti(state, search_input, property, graph, renderer, sea
             prop.toLowerCase().includes(lcQuery);
           }
         });
-      console.log(suggestions);
       // If we have a single perfect match, them we remove the suggestions, and
       // we consider the user has selected a node through the datalist
       // autocomplete:
@@ -681,13 +716,13 @@ function setSearchQueryMulti(state, search_input, property, graph, renderer, sea
       // state.suggestions = undefined;
     }
   });
-  console.log(`label: ${Boolean(suggestions_array[0])}, author: ${Boolean(suggestions_array[1])}`);
+  // console.log(`label: ${Boolean(suggestions_array[0])}, author: ${Boolean(suggestions_array[1])}`);
   if (suggestions_array[0] && suggestions_array[1])
     state.suggestions = suggestions_array[0].union(suggestions_array[1]);
   else if (suggestions_array[0]) state.suggestions = suggestions_array[0];
   else if (suggestions_array[1]) state.suggestions = suggestions_array[1];
   else state.suggestions = undefined;
-  console.log(state.suggestions);
+  // console.log(state.suggestions);
   // Refresh rendering
   // You can directly call `renderer.refresh()`, but if you need performances
   // you can provide some options to the refresh method.
@@ -714,6 +749,7 @@ function renderCard(nodeData) {
   const abstract = nodeData.abstract ? nodeData.abstract : 'No abstract available';
   // : "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed sit amet nulla auctor, vestibulum magna sed, convallis ex. Cum sociis natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus.";
   // <p>Authors: ${nodeData.author.join(', ')}</p>
+  console.log(typeof nodeData.citationcount);
   const cardHTML = `
     <div class="close-button-card"></div>
     <div class="card-contents">
@@ -724,7 +760,7 @@ function renderCard(nodeData) {
       <p>Year: ${nodeData.date}</p>
       <p>Journal: ${nodeData.journal}</p>
       <p>Citations: ${nodeData.citationcount}</p>
-      <p>Link: <a href="https://doi.org/${nodeData.doi}" target="_blank">doi.org/${nodeData.doi}</a></p>
+      <p>Link: <a href="${nodeData.link}" target="_blank">${nodeData.link.substring(8)}</a></p>
       <p>DOI: ${nodeData.doi}</p>
     </div>
   `;
@@ -738,10 +774,65 @@ function parse_year(year) {
     return 'undefined';
   }
   if (year.length > 0 && !isNaN(year[0])) {
-    console.log(year.substring(0, 4));
     return year.substring(0, 4);
   } else {
-    console.log(year.substring(year.length - 4));
     return year.substring(year.length - 4);
   }
+}
+
+async function create_table() {
+  let data_for_table = graph.toJSON().nodes.map((obj) => {
+    let res = { ...obj, ...obj.attributes };
+    delete res.attributes;
+    return res;
+  });
+  // let data_for_table = graph.toJSON().nodes.map((obj) => {
+  //   return Object.assign({}, obj, obj.attributes);
+  // });
+  console.log(data_for_table);
+  console.log(typeof data_for_table[0].citationcount);
+
+  // const widths = [
+  //   '0.324492145099706%',
+  //   '0.14221569322271063%',
+  //   '0.05408202418328433%',
+  //   '0.051077467284212974%',
+  //   '0.14221569322271063%',
+  //   '0.14221569322271063%',
+  //   '0.14370128376466482%',
+  // ];
+
+  const widths = [324, 142, 54, 51, 142, 142, 143.48333740234375];
+  const papersTable = new Tabulator('#top-papers-table', {
+    data: data_for_table,
+    // layout: 'fitDataStretch',
+    layout: 'fitColumns',
+    // autoColumns: true,
+    pagination: 'local', // enable local pagination
+    paginationSize: 10, // show 10 rows per page
+    paginationSizeSelector: [5, 10, 20, 50], // optional page size selector
+    columns: [
+      { title: 'Paper', field: 'label', width: widths[0] },
+      { title: 'Authors', field: 'author', width: widths[1] },
+      { title: 'Citations', field: 'citationcount', sorter: 'number', width: widths[2] },
+      { title: 'Year', field: 'date', sorter: 'number', width: widths[3] },
+      { title: 'Journal', field: 'journal', width: widths[4] },
+      { title: 'Link', field: 'link', formatter: 'link', formatterParams: { target: '_blank' }, width: widths[5] },
+      { title: 'Doi', field: 'doi', width: widths[6] },
+    ],
+    initialSort: [
+      { column: 'citationcount', dir: 'desc' }, // Sort by 'age' descending on load
+    ],
+  });
+  // Wait for the table to be fully initialized
+  await new Promise((resolve) => {
+    papersTable.on('tableBuilt', () => {
+      resolve();
+    });
+  });
+
+  // console.log(`formatter: ${papersTable.getColumnDefinition('Citations').formatter}`);
+  // console.log(`type: ${papersTable.getColumnDefinition('Citations').type}`);
+
+  return papersTable;
 }
