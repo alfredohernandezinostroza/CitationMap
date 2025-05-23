@@ -138,3 +138,12 @@ body {
   display: flex;
   justify-content: center;
 }
+#global-filters {
+  position: fixed;
+  bottom: 3vh; /* adjust this value */
+  left: 0;
+  width: 100%;
+  background-color: #fff; /* optional */
+  padding: 10px; /* optional */
+  border-top: 1px solid #ccc; /* optional */
+}

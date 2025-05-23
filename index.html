@@ -51,58 +51,60 @@
             <div id="top-papers-table"></div>
           </div>
         </div>
-        <div id="search-container">
-          <div id="search">
-            <input
-              type="search"
-              id="search-input-label"
-              list="suggestions-label"
-              placeholder="Try searching for a node..."
-            />
-            <datalist id="suggestions-label"></datalist>
+        <div id="global-filters">
+          <div id="search-container">
+            <div id="search">
+              <input
+                type="search"
+                id="search-input-label"
+                list="suggestions-label"
+                placeholder="Try searching for a node..."
+              />
+              <datalist id="suggestions-label"></datalist>
+            </div>
+            <div id="search-author">
+              <input
+                type="search"
+                id="search-input-author"
+                list="suggestions-author"
+                placeholder="Try searching for an author..."
+              />
+              <datalist id="suggestions-author"></datalist>
+            </div>
+            <div id="search-abstract">
+              <input
+                type="search"
+                id="search-input-abstract"
+                list="suggestions-abstract"
+                placeholder="Try searching in the abstracts..."
+              />
+              <datalist id="suggestions-abstract"></datalist>
+            </div>
+            <div id="search-journal">
+              <input
+                type="search"
+                id="search-input-journal"
+                list="suggestions-journal"
+                placeholder="Try searching for a journal..."
+              />
+              <datalist id="suggestions-journal"></datalist>
+            </div>
+            <div id="search-keywords">
+              <input
+                type="search"
+                id="search-input-keywords"
+                list="suggestions-keywords"
+                placeholder="Try searching in the keywords..."
+              />
+              <datalist id="suggestions-keywords"></datalist>
+            </div>
           </div>
-          <div id="search-author">
-            <input
-              type="search"
-              id="search-input-author"
-              list="suggestions-author"
-              placeholder="Try searching for an author..."
-            />
-            <datalist id="suggestions-author"></datalist>
+          <div class="input-years">
+            <label for="year-min-threshold" id="label-min-threshold">Min year: 1900</label>
+            <input id="year-min-threshold" type="range" min="1900" max="2025" step="1" />
+            <label for="year-max-threshold" id="label-max-threshold">Max year: 2025</label>
+            <input id="year-max-threshold" type="range" min="1900" max="2025" step="1" />
           </div>
-          <div id="search-abstract">
-            <input
-              type="search"
-              id="search-input-abstract"
-              list="suggestions-abstract"
-              placeholder="Try searching in the abstracts..."
-            />
-            <datalist id="suggestions-abstract"></datalist>
-          </div>
-          <div id="search-journal">
-            <input
-              type="search"
-              id="search-input-journal"
-              list="suggestions-journal"
-              placeholder="Try searching for a journal..."
-            />
-            <datalist id="suggestions-journal"></datalist>
-          </div>
-          <div id="search-keywords">
-            <input
-              type="search"
-              id="search-input-keywords"
-              list="suggestions-keywords"
-              placeholder="Try searching in the keywords..."
-            />
-            <datalist id="suggestions-keywords"></datalist>
-          </div>
-        </div>
-        <div class="input-years">
-          <label for="year-min-threshold" id="label-min-threshold">Min year: 1900</label>
-          <input id="year-min-threshold" type="range" min="1900" max="2025" step="1" />
-          <label for="year-max-threshold" id="label-max-threshold">Max year: 2025</label>
-          <input id="year-max-threshold" type="range" min="1900" max="2025" step="1" />
         </div>
         <!-- <script src="https://cdnjs.cloudflare.com/ajax/libs/graphology/0.26.0/graphology.umd.min.js"></script> -->
         <!-- <script src="https://cdnjs.cloudflare.com/ajax/libs/graphology/0.26.0/graphology.cjs.js"></script> -->
