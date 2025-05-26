@@ -8,6 +8,7 @@ import { clearFilters, updateFilter } from './table.js';
 // Load and render the GEXF file
 const graph = await load_gexf();
 clean_graph(graph);
+rotate_graph_180(graph);
 const papersTable = await create_table();
 // papersTable.getColumnDefinition("Citations")
 
@@ -106,6 +107,13 @@ function clean_graph(graph) {
     } else {
       graph.setNodeAttribute(node, 'date', 'undefined');
     }
+  });
+}
+
+function rotate_graph_180(graph) {
+  graph.forEachNode((node) => {
+    graph.updateNodeAttribute(node, 'x', (x) => -x);
+    graph.updateNodeAttribute(node, 'y', (y) => -y);
   });
 }
 
