@@ -8,6 +8,7 @@ import { clearFilters, updateFilter } from './table.js';
 // Load and render the GEXF file
 const graph = await load_gexf();
 clean_graph(graph);
+clean_graph(graph);
 rotate_graph_180(graph);
 const papersTable = await create_table();
 // papersTable.getColumnDefinition("Citations")
@@ -73,7 +74,8 @@ async function load_gexf() {
   document.querySelector('.header').appendChild(loadingIndicator);
 
   // let res = await fetch('./MotorLearning.gexf');
-  let res = await fetch('./just_center.gexf');
+  let res = await fetch('./all.gexf');
+  // let res = await fetch('./just_center.gexf');
   // let res = await fetch("./with_list_authors_deleted_outside_bounds.gexf");
   let to_parse = await res.text();
 
@@ -90,6 +92,16 @@ async function load_gexf() {
 
 function clean_graph(graph) {
   graph.forEachNode((node) => {
+    //there is a problem in which some nodes have edges towards or from nodes that are going to be deleted, thus,
+    //you need to call the function twice if you want to delete all the nodes
+    if (
+      !graph.hasNodeAttribute(node, 'citationcount') ||
+      graph.getNodeAttribute(node, 'citationcount') == 0 ||
+      graph.edges(node).length == 0
+    ) {
+      graph.dropNode(node);
+      return;
+    }
     if (!graph.hasNodeAttribute(node, 'abstract')) {
       graph.setNodeAttribute(node, 'abstract', '');
     }
