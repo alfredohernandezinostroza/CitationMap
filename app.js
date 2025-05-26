@@ -187,6 +187,7 @@ async function render_gexf(graph, state) {
   }
   // Instantiate sigma with custom settings for labels
   const renderer = new window.Sigma(graph, sigma_container, {
+    enableCameraRotation: false,
     minCameraRatio: 0.08,
     maxCameraRatio: 3,
     renderLabels: false,
