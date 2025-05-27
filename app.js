@@ -660,6 +660,22 @@ function add_labels(renderer, state, sigma_container) {
       }
     }
   });
+
+  const clusterLabelsRow = document.createElement('div');
+  clusterLabelsRow.className = 'cluster-labels-row';
+  document.querySelector('#global-filters').prepend(clusterLabelsRow);
+
+  for (const cluster in state.clusters) {
+    const checkbox = document.createElement('input');
+    checkbox.type = 'checkbox';
+    checkbox.id = `cluster-${cluster}`;
+    checkbox.checked = true;
+    const label = document.createElement('label');
+    label.textContent = state.clusters[cluster].label;
+    label.htmlFor = `cluster-${cluster}`;
+    clusterLabelsRow.appendChild(checkbox);
+    clusterLabelsRow.appendChild(label);
+  }
 }
 
 async function create_table() {

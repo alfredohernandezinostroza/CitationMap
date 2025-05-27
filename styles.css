@@ -139,6 +139,7 @@ body {
 .input-years {
   display: flex;
   justify-content: center;
+  padding-top: 10px;
 }
 #global-filters {
   position: fixed;
@@ -161,4 +162,18 @@ body {
   font-weight: 400;
   font-size: 1.8rem;
   text-shadow: 2px 2px 1px white, -2px -2px 1px white, -2px 2px 1px white, 2px -2px 1px white;
+}
+.cluster-labels-row {
+  display: flex;
+  flex-wrap: wrap;
+  margin-bottom: 10px;
+  justify-content: center;
+}
+
+.cluster-labels-row input[type='checkbox'] {
+  margin-right: 10px;
+}
+
+.cluster-labels-row label {
+  margin-right: 20px;
 }
