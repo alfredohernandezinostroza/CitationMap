@@ -55,7 +55,34 @@ const state = {
   suggestions: undefined, //new Set()
   query_label: '',
   query_author: '',
+  clusters: {
+    2399: { label: 'Pink', positions: [], color: 'rgb(223, 137, 255)' },
+    4850: { label: 'Green', positions: [], color: 'rgb(115, 192, 0)' },
+    407: { label: 'Cian', positions: [], color: 'rgb(0, 196, 255)' },
+    3360: { label: 'Black', positions: [], color: 'rgb(76, 70, 62)' },
+    351: { label: 'Orange', positions: [], color: 'rgb(255, 136, 5)' },
+    1123: { label: 'Fuchsia', positions: [], color: 'rgb(255, 85, 132)' },
+    802: { label: 'Turquoise', positions: [], color: 'rgb(0, 189, 148)' },
+    4424: { label: 'Rose', positions: [], color: 'rgb(211, 179, 176)' },
+  }, //objects like this: { [key: int]: Cluster }
 };
+
+graph.forEachNode((node, atts) => {
+  if (atts.modularity_class in state.clusters)
+    state.clusters[atts.modularity_class].positions.push({ x: atts.x, y: atts.y });
+  // node color depends on the cluster it belongs to
+  // atts.color = cluster.color;
+  // // node size depends on its degree
+  // atts.size = Math.sqrt(graph.degree(node)) / 2;
+  // store cluster's nodes positions to calculate cluster label position
+});
+
+for (const key in state.clusters) {
+  state.clusters[key].x =
+    state.clusters[key].positions.reduce((acc, p) => acc + p.x, 0) / state.clusters[key].positions.length;
+  state.clusters[key].y =
+    state.clusters[key].positions.reduce((acc, p) => acc + p.y, 0) / state.clusters[key].positions.length;
+}
 
 try {
   renderer = await render_gexf(graph, state); //.catch(error => console.error('Error rendering gexf', error));
@@ -219,6 +246,8 @@ async function render_gexf(graph, state) {
     enableHovering: false,
     allowInvalidContainer: true,
   });
+
+  add_labels(renderer, state, sigma_container);
 
   // Bind search input interactions:
   search_input_label.addEventListener('input', () => {
@@ -599,6 +628,38 @@ function parse_year(year) {
   } else {
     return year.substring(year.length - 4);
   }
+}
+
+function add_labels(renderer, state, sigma_container) {
+  // create the clustersLabel layer
+  const clustersLayer = document.createElement('div');
+  clustersLayer.id = 'clustersLayer';
+  let clusterLabelsDoms = '';
+  for (const key in state.clusters) {
+    // for each cluster create a div label
+    const cluster = state.clusters[key];
+    // adapt the position to viewport coordinates
+    const viewportPos = renderer.graphToViewport(cluster);
+    clusterLabelsDoms += `<div id='${cluster.label}' class="clusterLabel" style="top:${viewportPos.y}px;left:${viewportPos.x}px;color:${cluster.color}">${cluster.label}</div>`;
+  }
+  clustersLayer.innerHTML = clusterLabelsDoms;
+
+  // insert the layer underneath the hovers layer
+  sigma_container.insertBefore(clustersLayer, sigma_container.querySelector('.sigma-hovers'));
+
+  // Clusters labels position needs to be updated on each render
+  renderer.on('afterRender', () => {
+    for (const key in state.clusters) {
+      const cluster = state.clusters[key];
+      const clusterLabel = document.getElementById(cluster.label);
+      if (clusterLabel) {
+        // update position from the viewport
+        const viewportPos = renderer.graphToViewport(cluster);
+        clusterLabel.style.top = `${viewportPos.y}px`;
+        clusterLabel.style.left = `${viewportPos.x}px`;
+      }
+    }
+  });
 }
 
 async function create_table() {
