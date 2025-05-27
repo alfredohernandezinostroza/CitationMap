@@ -251,30 +251,45 @@ async function render_gexf(graph, state) {
 
   // Bind search input interactions:
   search_input_label.addEventListener('input', () => {
-    setSearchQuery(state, graph, renderer, search_inputs);
+    setSearchQuery2(state, graph, renderer, search_inputs);
+    if (state.suggestions) fitViewportToNodes(renderer, Array.from(state.suggestions), { animate: true });
   });
   search_input_author.addEventListener('input', () => {
-    setSearchQuery(state, graph, renderer, search_inputs);
+    setSearchQuery2(state, graph, renderer, search_inputs);
+    if (state.suggestions) fitViewportToNodes(renderer, Array.from(state.suggestions), { animate: true });
   });
   search_input_abstract.addEventListener('input', () => {
-    setSearchQuery(state, graph, renderer, search_inputs);
+    setSearchQuery2(state, graph, renderer, search_inputs);
+    if (state.suggestions) fitViewportToNodes(renderer, Array.from(state.suggestions), { animate: true });
   });
   search_input_journal.addEventListener('input', () => {
-    setSearchQuery(state, graph, renderer, search_inputs);
+    setSearchQuery2(state, graph, renderer, search_inputs);
+    if (state.suggestions) fitViewportToNodes(renderer, Array.from(state.suggestions), { animate: true });
   });
   search_input_keywords.addEventListener('input', () => {
-    setSearchQuery(state, graph, renderer, search_inputs);
+    setSearchQuery2(state, graph, renderer, search_inputs);
+    if (state.suggestions) fitViewportToNodes(renderer, Array.from(state.suggestions), { animate: true });
   });
 
   // Bind labels threshold to range input
   minYearThresholdRange.addEventListener('input', () => {
-    setSearchQuery(state, graph, renderer, search_inputs);
+    setSearchQuery2(state, graph, renderer, search_inputs);
+    if (state.suggestions) fitViewportToNodes(renderer, Array.from(state.suggestions), { animate: true });
     // renderer?.setSetting('labelRenderedSizeThreshold', +labelsThresholdRange.value);
   });
   maxYearThresholdRange.addEventListener('input', () => {
-    setSearchQuery(state, graph, renderer, search_inputs);
+    setSearchQuery2(state, graph, renderer, search_inputs);
+    if (state.suggestions) fitViewportToNodes(renderer, Array.from(state.suggestions), { animate: true });
     // renderer?.setSetting('labelRenderedSizeThreshold', +labelsThresholdRange.value);
   });
+
+  const checkboxes = Array.from(document.querySelectorAll('input[type="checkbox"][id^="cluster"]'));
+  checkboxes.forEach((checkbox) =>
+    checkbox.addEventListener('change', () => {
+      setSearchQuery2(state, graph, renderer, search_inputs);
+      // if (state.suggestions) fitViewportToNodes(renderer, Array.from(state.suggestions), { animate: true });
+    }),
+  );
 
   // Set proper range initial value:
   minYearThresholdRange.value = '1900';
@@ -353,7 +368,6 @@ function bind_graph_interactions(renderer, state) {
 
   // Hover renderer for additional visual cues
   renderer.setSetting('defaultDrawNodeHover', function (context, data, settings) {
-    debugger;
     // if (state.query_label !== "" && state.query_author !== "") {
     // This draws the hovered node differently
     const size = settings.nodeReducer?.(data.node, data.data)?.size || data.size;
@@ -515,6 +529,123 @@ function setSearchQuery(state, graph, renderer, search_inputs) {
   });
 }
 
+function setSearchQuery2(state, graph, renderer, search_inputs, checkboxes) {
+  const query_label = search_inputs[0].value;
+  const query_author = search_inputs[1].value;
+  const query_abstract = search_inputs[2].value;
+  const query_journal = search_inputs[3].value;
+  const query_keywords = search_inputs[4].value;
+  const min_year_value = +search_inputs[5].value; //convert to int
+  const max_year_value = +search_inputs[6].value; //convert to int
+  let suggestions_label = undefined;
+  let suggestions_author = undefined;
+  let suggestions_abstract = undefined;
+  let suggestions_journal = undefined;
+  let suggestions_keywords = undefined;
+  state.query_label = query_label;
+  state.query_author = query_author;
+  state.query_abstract = query_abstract;
+  state.query_journal = query_journal;
+  state.query_keywords = query_keywords;
+  if (query_label !== '') {
+    const lcQuery = query_label.toLowerCase();
+    suggestions_label = graph
+      .nodes()
+      .map((n) => ({ id: n, prop: graph.getNodeAttribute(n, 'label') }))
+      .filter(({ prop }) => prop.toLowerCase().includes(lcQuery));
+    suggestions_label = new Set(suggestions_label.map(({ id }) => id));
+  }
+  if (query_author !== '') {
+    const queries = query_author.split(',');
+    suggestions_author = new Set();
+    queries.forEach((query) => {
+      const lcQuery = query.toLowerCase();
+      let suggestions = graph
+        .nodes()
+        .map((n) => ({ id: n, array_prop: graph.getNodeAttribute(n, 'author') }))
+        .filter(({ array_prop }) => array_prop.some((v) => v.toLowerCase().includes(lcQuery)));
+      suggestions_author = suggestions_author.union(new Set(suggestions.map(({ id }) => id)));
+    });
+  }
+  if (query_abstract !== '') {
+    const lcQuery = query_abstract.toLowerCase();
+    suggestions_abstract = graph
+      .nodes()
+      .map((n) => ({ id: n, prop: graph.getNodeAttribute(n, 'abstract') }))
+      .filter(({ prop }) => prop.toLowerCase().includes(lcQuery));
+    suggestions_abstract = new Set(suggestions_abstract.map(({ id }) => id));
+  }
+  if (query_journal !== '') {
+    const lcQuery = query_journal.toLowerCase();
+    suggestions_journal = graph
+      .nodes()
+      .map((n) => ({ id: n, prop: graph.getNodeAttribute(n, 'journal') }))
+      .filter(({ prop }) => prop.toLowerCase().includes(lcQuery));
+    suggestions_journal = new Set(suggestions_journal.map(({ id }) => id));
+  }
+  if (query_keywords !== '') {
+    const queries = query_keywords.split(',');
+    suggestions_keywords = new Set();
+    queries.forEach((query) => {
+      const lcQuery = query.toLowerCase();
+      let suggestions = graph
+        .nodes()
+        .map((n) => ({ id: n, array_prop: graph.getNodeAttribute(n, 'keywords') }))
+        .filter(({ array_prop }) => array_prop.some((v) => v.toLowerCase().includes(lcQuery)));
+      suggestions_keywords = suggestions_keywords.union(new Set(suggestions.map(({ id }) => id)));
+    });
+  }
+
+  let year_nodes = graph
+    .nodes()
+    .map((n) => ({ id: n, year: graph.getNodeAttribute(n, 'date') }))
+    .filter(({ year }) => (year ? +year >= min_year_value && +year <= max_year_value : false));
+  year_nodes = new Set(year_nodes.map(({ id }) => id));
+  debugger;
+
+  const checkedCheckboxes = Array.from(document.querySelectorAll('input[type="checkbox"][id^="cluster"]:checked'));
+  const checked_mod_classes = checkedCheckboxes.map((v) => v.id.split('-')[1]);
+  let nodes_in_checked_classes = graph
+    .nodes()
+    .map((n) => ({ id: n, mod_class: graph.getNodeAttribute(n, 'modularity_class') }))
+    .filter(
+      ({ mod_class }) =>
+        checked_mod_classes.includes(mod_class.toString()) ||
+        !Object.keys(state.clusters).includes(mod_class.toString()),
+    );
+  nodes_in_checked_classes = new Set(nodes_in_checked_classes.map(({ id }) => id));
+
+  const definedSuggestions = [
+    suggestions_label,
+    suggestions_author,
+    suggestions_abstract,
+    suggestions_journal,
+    suggestions_keywords,
+    year_nodes,
+    nodes_in_checked_classes,
+  ].filter(Boolean);
+  state.suggestions = definedSuggestions.reduce(
+    (acc, suggestion) => acc.intersection(suggestion),
+    definedSuggestions[0],
+  );
+
+  document.getElementById('label-min-threshold').innerHTML = `Min year: ${search_inputs[5].value}`;
+  document.getElementById('label-max-threshold').innerHTML = `Max year: ${search_inputs[6].value}`;
+
+  let new_table_data = graph.toJSON().nodes.filter((node) => state.suggestions.has(node.key));
+  new_table_data = new_table_data.map((obj) => {
+    let res = { ...obj, ...obj.attributes };
+    delete res.attributes;
+    return res;
+  });
+
+  papersTable.replaceData(new_table_data);
+
+  renderer.refresh({
+    skipIndexation: true,
+  });
+}
+
 function setSearchQueryMulti(state, search_input, property, graph, renderer, search_inputs) {
   // function setSearchQuery(query, state, search_input, graph, renderer) {
   // state.searchQuery = query;
@@ -649,6 +780,8 @@ function add_labels(renderer, state, sigma_container) {
 
   // Clusters labels position needs to be updated on each render
   renderer.on('afterRender', () => {
+    const checkedCheckboxes = Array.from(document.querySelectorAll('input[type="checkbox"][id^="cluster"]:checked'));
+    const checked_mod_classes = checkedCheckboxes.map((v) => v.id.split('-')[1]);
     for (const key in state.clusters) {
       const cluster = state.clusters[key];
       const clusterLabel = document.getElementById(cluster.label);
@@ -657,6 +790,11 @@ function add_labels(renderer, state, sigma_container) {
         const viewportPos = renderer.graphToViewport(cluster);
         clusterLabel.style.top = `${viewportPos.y}px`;
         clusterLabel.style.left = `${viewportPos.x}px`;
+      }
+      if (!checked_mod_classes.includes(key)) {
+        clusterLabel.style.display = 'none';
+      } else {
+        clusterLabel.style.display = 'block';
       }
     }
   });
