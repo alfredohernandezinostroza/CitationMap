@@ -222,28 +222,28 @@ async function render_gexf(graph, state) {
 
   // Bind search input interactions:
   search_input_label.addEventListener('input', () => {
-    setSearchQuery4(state, graph, renderer, search_inputs);
+    setSearchQuery(state, graph, renderer, search_inputs);
   });
   search_input_author.addEventListener('input', () => {
-    setSearchQuery4(state, graph, renderer, search_inputs);
+    setSearchQuery(state, graph, renderer, search_inputs);
   });
   search_input_abstract.addEventListener('input', () => {
-    setSearchQuery4(state, graph, renderer, search_inputs);
+    setSearchQuery(state, graph, renderer, search_inputs);
   });
   search_input_journal.addEventListener('input', () => {
-    setSearchQuery4(state, graph, renderer, search_inputs);
+    setSearchQuery(state, graph, renderer, search_inputs);
   });
   search_input_keywords.addEventListener('input', () => {
-    setSearchQuery4(state, graph, renderer, search_inputs);
+    setSearchQuery(state, graph, renderer, search_inputs);
   });
 
   // Bind labels threshold to range input
   minYearThresholdRange.addEventListener('input', () => {
-    setSearchQuery4(state, graph, renderer, search_inputs);
+    setSearchQuery(state, graph, renderer, search_inputs);
     // renderer?.setSetting('labelRenderedSizeThreshold', +labelsThresholdRange.value);
   });
   maxYearThresholdRange.addEventListener('input', () => {
-    setSearchQuery4(state, graph, renderer, search_inputs);
+    setSearchQuery(state, graph, renderer, search_inputs);
     // renderer?.setSetting('labelRenderedSizeThreshold', +labelsThresholdRange.value);
   });
 
@@ -252,7 +252,7 @@ async function render_gexf(graph, state) {
   maxYearThresholdRange.value = '2025';
 
   try {
-    bind_graph_interactions2(renderer, state);
+    bind_graph_interactions(renderer, state);
   } catch (error) {
     console.error('Error binding graph interactions:', error);
   }
@@ -272,7 +272,7 @@ async function render_gexf(graph, state) {
   return renderer;
 }
 
-function bind_graph_interactions2(renderer, state) {
+function bind_graph_interactions(renderer, state) {
   // Node reducer with hover functionality
   renderer.setSetting('nodeReducer', function (node, data) {
     const res = { ...data };
@@ -384,190 +384,7 @@ function bind_graph_interactions2(renderer, state) {
   });
 }
 
-function setSearchQuery(state, search_input, property, graph, renderer, search_inputs) {
-  // function setSearchQuery(query, state, search_input, graph, renderer) {
-  // state.searchQuery = query;
-
-  //   if (search_input.value !== query){
-  //     search_input.value = query
-  //     console.log(`${query} vs ${search_input.value}`);
-  // }
-  const query = search_input.value;
-  if (query !== '') {
-    const lcQuery = query.toLowerCase();
-    const suggestions = graph
-      .nodes()
-      .map((n) => ({ id: n, prop: graph.getNodeAttribute(n, property) }))
-      .filter(({ prop }) => prop.some((v) => v.toLowerCase().includes(lcQuery)));
-
-    // If we have a single perfect match, them we remove the suggestions, and
-    // we consider the user has selected a node through the datalist
-    // autocomplete:
-    if (suggestions.length === 1 && suggestions[0].label === query) {
-      state.selectedNode = suggestions[0].id;
-      state.suggestions = undefined;
-
-      // Move the camera to center it on the selected node:
-      const nodePosition = renderer.getNodeDisplayData(state.selectedNode);
-      renderer.getCamera().animate(nodePosition, {
-        duration: 500,
-      });
-    }
-    // Else, we display the suggestions list:
-    else {
-      state.selectedNode = undefined;
-      state.suggestions = new Set(suggestions.map(({ id }) => id));
-    }
-  }
-  // If the query is empty, then we reset the selectedNode / suggestions state:
-  else {
-    state.selectedNode = undefined;
-    state.suggestions = undefined;
-  }
-
-  // Refresh rendering
-  // You can directly call `renderer.refresh()`, but if you need performances
-  // you can provide some options to the refresh method.
-  // In this case, we don't touch the graph data so we can skip its reindexation
-  renderer.refresh({
-    skipIndexation: true,
-  });
-}
-
-function setSearchQuery2(state, graph, renderer, search_inputs) {
-  const query_label = search_inputs[0].value;
-  const query_author = search_inputs[1].value;
-  let suggestions_label = undefined;
-  let suggestions_author = undefined;
-  state.query_label = query_label;
-  state.query_author = query_author;
-  if (query_label !== '') {
-    const lcQuery = query_label.toLowerCase();
-    suggestions_label = graph
-      .nodes()
-      .map((n) => ({ id: n, prop: graph.getNodeAttribute(n, 'label') }))
-      .filter(({ prop }) => prop.toLowerCase().includes(lcQuery));
-    suggestions_label = new Set(suggestions_label.map(({ id }) => id));
-  }
-  if (query_author !== '') {
-    const lcQuery = query_author.toLowerCase();
-    suggestions_author = graph
-      .nodes()
-      .map((n) => ({ id: n, prop: graph.getNodeAttribute(n, 'author') }))
-      .filter(({ prop }) => prop.some((v) => v.toLowerCase().includes(lcQuery)));
-    suggestions_author = new Set(suggestions_author.map(({ id }) => id));
-  }
-  const definedSuggestions = [suggestions_label, suggestions_author].filter(Boolean);
-  state.suggestions = definedSuggestions.reduce(
-    (acc, suggestion) => acc.intersection(suggestion),
-    definedSuggestions[0],
-  );
-  if (state.suggestions) fitViewportToNodes(renderer, Array.from(state.suggestions), { animate: true });
-
-  renderer.refresh({
-    skipIndexation: true,
-  });
-}
-
-function setSearchQuery3(state, graph, renderer, search_inputs) {
-  const query_label = search_inputs[0].value;
-  const query_author = search_inputs[1].value;
-  const query_abstract = search_inputs[2].value;
-  const query_journal = search_inputs[3].value;
-  const query_keywords = search_inputs[4].value;
-  let suggestions_label = undefined;
-  let suggestions_author = undefined;
-  let suggestions_abstract = undefined;
-  let suggestions_journal = undefined;
-  let suggestions_keywords = undefined;
-  state.query_label = query_label;
-  state.query_author = query_author;
-  state.query_abstract = query_abstract;
-  state.query_journal = query_journal;
-  state.query_keywords = query_keywords;
-  if (query_label !== '') {
-    const lcQuery = query_label.toLowerCase();
-    suggestions_label = graph
-      .nodes()
-      .map((n) => ({ id: n, prop: graph.getNodeAttribute(n, 'label') }))
-      .filter(({ prop }) => prop.toLowerCase().includes(lcQuery));
-    suggestions_label = new Set(suggestions_label.map(({ id }) => id));
-  }
-  if (query_author !== '') {
-    const queries = query_author.split(',');
-    suggestions_author = new Set();
-    queries.forEach((query) => {
-      const lcQuery = query.toLowerCase();
-      let suggestions = graph
-        .nodes()
-        .map((n) => ({ id: n, array_prop: graph.getNodeAttribute(n, 'author') }))
-        .filter(({ array_prop }) => array_prop.some((v) => v.toLowerCase().includes(lcQuery)));
-      suggestions_author = suggestions_author.union(new Set(suggestions.map(({ id }) => id)));
-    });
-  }
-  // if (query_author !== '') {
-  //   const lcQuery = query_author.toLowerCase();
-  //   suggestions_author = graph
-  //     .nodes()
-  //     .map((n) => ({ id: n, prop: graph.getNodeAttribute(n, 'author') }))
-  //     .filter(({ prop }) => prop.some((v) => v.toLowerCase().includes(lcQuery)));
-  //   suggestions_author = new Set(suggestions_author.map(({ id }) => id));
-  // }
-  if (query_abstract !== '') {
-    const lcQuery = query_abstract.toLowerCase();
-    suggestions_abstract = graph
-      .nodes()
-      .map((n) => ({ id: n, prop: graph.getNodeAttribute(n, 'abstract') }))
-      .filter(({ prop }) => prop.toLowerCase().includes(lcQuery));
-    suggestions_abstract = new Set(suggestions_abstract.map(({ id }) => id));
-  }
-  if (query_journal !== '') {
-    const lcQuery = query_journal.toLowerCase();
-    suggestions_journal = graph
-      .nodes()
-      .map((n) => ({ id: n, prop: graph.getNodeAttribute(n, 'journal') }))
-      .filter(({ prop }) => prop.toLowerCase().includes(lcQuery));
-    suggestions_journal = new Set(suggestions_journal.map(({ id }) => id));
-  }
-  if (query_keywords !== '') {
-    const queries = query_keywords.split(',');
-    suggestions_keywords = new Set();
-    queries.forEach((query) => {
-      const lcQuery = query.toLowerCase();
-      let suggestions = graph
-        .nodes()
-        .map((n) => ({ id: n, array_prop: graph.getNodeAttribute(n, 'keywords') }))
-        .filter(({ array_prop }) => array_prop.some((v) => v.toLowerCase().includes(lcQuery)));
-      suggestions_keywords = suggestions_keywords.union(new Set(suggestions.map(({ id }) => id)));
-    });
-  }
-  // if (query_keywords !== '') {
-  //   const lcQuery = query_keywords.toLowerCase();
-  //   suggestions_keywords = graph
-  //     .nodes()
-  //     .map((n) => ({ id: n, prop: graph.getNodeAttribute(n, 'keywords') }))
-  //     .filter(({ prop }) => prop.some((v) => v.toLowerCase().includes(lcQuery)));
-  //   suggestions_keywords = new Set(suggestions_keywords.map(({ id }) => id));
-  // }
-  const definedSuggestions = [
-    suggestions_label,
-    suggestions_author,
-    suggestions_abstract,
-    suggestions_journal,
-    suggestions_keywords,
-  ].filter(Boolean);
-  state.suggestions = definedSuggestions.reduce(
-    (acc, suggestion) => acc.intersection(suggestion),
-    definedSuggestions[0],
-  );
-  if (state.suggestions) fitViewportToNodes(renderer, Array.from(state.suggestions), { animate: true });
-
-  renderer.refresh({
-    skipIndexation: true,
-  });
-}
-
-function setSearchQuery4(state, graph, renderer, search_inputs) {
+function setSearchQuery(state, graph, renderer, search_inputs) {
   const query_label = search_inputs[0].value;
   const query_author = search_inputs[1].value;
   const query_abstract = search_inputs[2].value;
