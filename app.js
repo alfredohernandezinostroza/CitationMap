@@ -351,7 +351,7 @@ function bind_graph_interactions(renderer, state) {
   // Edge reducer with hover functionality
   renderer.setSetting('edgeReducer', function (edge, data) {
     const res = { ...data };
-    res.size = 0.00001; // Base edge width
+    res.size = 0.05; // Base edge width
     res.color = '#e0e0e0'; // Edge color
     if (
       state.hoveredNode &&
