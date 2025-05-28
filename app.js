@@ -382,6 +382,8 @@ function bind_graph_interactions(renderer, state) {
 
     // Draw the label for the hovered node
     if (data.label) {
+      const maxWidth = 400;
+
       const size = settings.labelSize,
         font = settings.labelFont,
         weight = settings.labelWeight;
@@ -397,10 +399,23 @@ function bind_graph_interactions(renderer, state) {
 
       const PADDING = 2;
 
-      const textWidth = context.measureText(data.label).width,
+      // split the text into multiple lines
+      const lines = [];
+      let currentLine = '';
+      for (const word of data.label.split(' ')) {
+        if (context.measureText(currentLine + word).width > maxWidth) {
+          lines.push(currentLine.trim());
+          currentLine = word + ' ';
+        } else {
+          currentLine += word + ' ';
+        }
+      }
+      lines.push(currentLine.trim());
+
+      const textWidth = context.measureText(lines[0]).width,
         boxWidth = Math.round(textWidth + 5),
-        boxHeight = Math.round(size + 2 * PADDING),
-        radius = Math.max(data.size, size / 2) + PADDING;
+        boxHeight = Math.round(size * (lines.length + 1) + 2 * PADDING),
+        radius = Math.max(data.size, (size * (lines.length + 1)) / 2) + PADDING;
 
       const angleRadian = Math.asin(boxHeight / 2 / radius);
       const xDeltaCoord = Math.sqrt(Math.abs(Math.pow(radius, 2) - Math.pow(boxHeight / 2, 2)));
@@ -423,112 +438,13 @@ function bind_graph_interactions(renderer, state) {
         : settings.labelColor.color;
 
       context.fillStyle = color;
-
-      context.fillText(data.label, data.x + data.size + 3, data.y + size / 3);
+      if (lines.length == 1) context.fillText(lines[0], data.x + data.size + 3, data.y + size / 3);
+      else {
+        lines.forEach((line, i) => {
+          context.fillText(line, data.x + data.size + 3, data.y - size / 6 + i * size);
+  });
+      }
     }
-    // }
-  });
-}
-
-function setSearchQuery(state, graph, renderer, search_inputs) {
-  const query_label = search_inputs[0].value;
-  const query_author = search_inputs[1].value;
-  const query_abstract = search_inputs[2].value;
-  const query_journal = search_inputs[3].value;
-  const query_keywords = search_inputs[4].value;
-  const min_year_value = +search_inputs[5].value; //convert to int
-  const max_year_value = +search_inputs[6].value; //convert to int
-  let suggestions_label = undefined;
-  let suggestions_author = undefined;
-  let suggestions_abstract = undefined;
-  let suggestions_journal = undefined;
-  let suggestions_keywords = undefined;
-  state.query_label = query_label;
-  state.query_author = query_author;
-  state.query_abstract = query_abstract;
-  state.query_journal = query_journal;
-  state.query_keywords = query_keywords;
-  if (query_label !== '') {
-    const lcQuery = query_label.toLowerCase();
-    suggestions_label = graph
-      .nodes()
-      .map((n) => ({ id: n, prop: graph.getNodeAttribute(n, 'label') }))
-      .filter(({ prop }) => prop.toLowerCase().includes(lcQuery));
-    suggestions_label = new Set(suggestions_label.map(({ id }) => id));
-  }
-  if (query_author !== '') {
-    const queries = query_author.split(',');
-    suggestions_author = new Set();
-    queries.forEach((query) => {
-      const lcQuery = query.toLowerCase();
-      let suggestions = graph
-        .nodes()
-        .map((n) => ({ id: n, array_prop: graph.getNodeAttribute(n, 'author') }))
-        .filter(({ array_prop }) => array_prop.some((v) => v.toLowerCase().includes(lcQuery)));
-      suggestions_author = suggestions_author.union(new Set(suggestions.map(({ id }) => id)));
-    });
-  }
-  if (query_abstract !== '') {
-    const lcQuery = query_abstract.toLowerCase();
-    suggestions_abstract = graph
-      .nodes()
-      .map((n) => ({ id: n, prop: graph.getNodeAttribute(n, 'abstract') }))
-      .filter(({ prop }) => prop.toLowerCase().includes(lcQuery));
-    suggestions_abstract = new Set(suggestions_abstract.map(({ id }) => id));
-  }
-  if (query_journal !== '') {
-    const lcQuery = query_journal.toLowerCase();
-    suggestions_journal = graph
-      .nodes()
-      .map((n) => ({ id: n, prop: graph.getNodeAttribute(n, 'journal') }))
-      .filter(({ prop }) => prop.toLowerCase().includes(lcQuery));
-    suggestions_journal = new Set(suggestions_journal.map(({ id }) => id));
-  }
-  if (query_keywords !== '') {
-    const queries = query_keywords.split(',');
-    suggestions_keywords = new Set();
-    queries.forEach((query) => {
-      const lcQuery = query.toLowerCase();
-      let suggestions = graph
-        .nodes()
-        .map((n) => ({ id: n, array_prop: graph.getNodeAttribute(n, 'keywords') }))
-        .filter(({ array_prop }) => array_prop.some((v) => v.toLowerCase().includes(lcQuery)));
-      suggestions_keywords = suggestions_keywords.union(new Set(suggestions.map(({ id }) => id)));
-    });
-  }
-  let year_nodes = graph
-    .nodes()
-    .map((n) => ({ id: n, year: graph.getNodeAttribute(n, 'date') }))
-    .filter(({ year }) => (year ? +year >= min_year_value && +year <= max_year_value : false));
-  year_nodes = new Set(year_nodes.map(({ id }) => id));
-  const definedSuggestions = [
-    suggestions_label,
-    suggestions_author,
-    suggestions_abstract,
-    suggestions_journal,
-    suggestions_keywords,
-    year_nodes,
-  ].filter(Boolean);
-  state.suggestions = definedSuggestions.reduce(
-    (acc, suggestion) => acc.intersection(suggestion),
-    definedSuggestions[0],
-  );
-
-  document.getElementById('label-min-threshold').innerHTML = `Min year: ${search_inputs[5].value}`;
-  document.getElementById('label-max-threshold').innerHTML = `Max year: ${search_inputs[6].value}`;
-  if (state.suggestions) fitViewportToNodes(renderer, Array.from(state.suggestions), { animate: true });
-
-  let new_table_data = graph.toJSON().nodes.filter((node) => state.suggestions.has(node.key));
-  new_table_data = new_table_data.map((obj) => {
-    let res = { ...obj, ...obj.attributes };
-    delete res.attributes;
-    return res;
-  });
-  console.log(new_table_data);
-  papersTable.replaceData(new_table_data);
-
-  renderer.refresh({
-    skipIndexation: true,
   });
 }
 
