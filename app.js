@@ -77,7 +77,6 @@ graph.forEachNode((node, atts) => {
   // node color depends on the cluster it belongs to
   // atts.color = cluster.color;
   // // node size depends on its degree
-  // atts.size = Math.sqrt(graph.degree(node)) / 2;
   // store cluster's nodes positions to calculate cluster label position
 });
 
@@ -241,6 +240,8 @@ async function render_gexf(graph, state) {
   }
   // Instantiate sigma with custom settings for labels
   const renderer = new window.Sigma(graph, sigma_container, {
+    zoomToSizeRatioFunction: (value) => value,
+    minEdgeThickness: 0,
     enableCameraRotation: false,
     minCameraRatio: 0.08,
     maxCameraRatio: 3,
