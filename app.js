@@ -185,6 +185,9 @@ async function render_gexf(graph, state) {
   const search_suggestions_journal = document.getElementById('suggestions-journal');
   const search_suggestions_abstract = document.getElementById('suggestions-abstract');
 
+  const selectedNodesCountText = document.getElementById('selected-nodes-count-text');
+  selectedNodesCountText.textContent = `Nodes selected: ${graph.nodes().length}`;
+
   // Feed the datalist autocomplete values:
   search_suggestions_label.innerHTML = graph
     .nodes()
@@ -631,6 +634,13 @@ function setSearchQuery2(state, graph, renderer, search_inputs, checkboxes) {
 
   document.getElementById('label-min-threshold').innerHTML = `Min year: ${search_inputs[5].value}`;
   document.getElementById('label-max-threshold').innerHTML = `Max year: ${search_inputs[6].value}`;
+
+  const selectedNodesCountText = document.getElementById('selected-nodes-count-text');
+  if (state.suggestions) selectedNodesCountText.textContent = `Nodes selected: ${state.suggestions.size}`;
+  else selectedNodesCountText.textContent = `Nodes selected: ${graph.nodes().length}`;
+
+  // if (state.suggestions && state.suggestions.size < 50)
+  //   fitViewportToNodes(renderer, Array.from(state.suggestions), { animate: true });
 
   let new_table_data = graph.toJSON().nodes.filter((node) => state.suggestions.has(node.key));
   new_table_data = new_table_data.map((obj) => {
