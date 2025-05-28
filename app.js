@@ -80,6 +80,10 @@ graph.forEachNode((node, atts) => {
   // store cluster's nodes positions to calculate cluster label position
 });
 
+graph.forEachEdge((edge, _attributes, _source, _target, sourceAttributes) => {
+  graph.setEdgeAttribute(edge, 'color', sourceAttributes.color);
+});
+
 for (const key in state.clusters) {
   state.clusters[key].x =
     state.clusters[key].positions.reduce((acc, p) => acc + p.x, 0) / state.clusters[key].positions.length;
@@ -314,6 +318,10 @@ async function render_gexf(graph, state) {
   renderer.on('leaveNode', () => {
     setHoveredNode(undefined);
   });
+
+  renderer
+    .getCamera()
+    .setState({ x: 0.5177388063772427, y: 0.46557488233757816, angle: 0, ratio: 0.29972943598335855 });
   return renderer;
 }
 
@@ -352,7 +360,6 @@ function bind_graph_interactions(renderer, state) {
   renderer.setSetting('edgeReducer', function (edge, data) {
     const res = { ...data };
     res.size = 0.05; // Base edge width
-    res.color = '#e0e0e0'; // Edge color
     if (
       state.hoveredNode &&
       !graph.extremities(edge).every((n) => n === state.hoveredNode || graph.areNeighbors(n, state.hoveredNode))
@@ -440,7 +447,7 @@ function bind_graph_interactions(renderer, state) {
       else {
         lines.forEach((line, i) => {
           context.fillText(line, data.x + data.size + 3, data.y - size / 6 + i * size);
-  });
+        });
       }
     }
   });
