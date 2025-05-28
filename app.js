@@ -56,14 +56,14 @@ const state = {
   query_label: '',
   query_author: '',
   clusters: {
-    2399: { label: 'Pink', positions: [], color: 'rgb(223, 137, 255)' },
-    4850: { label: 'Green', positions: [], color: 'rgb(115, 192, 0)' },
-    407: { label: 'Cian', positions: [], color: 'rgb(0, 196, 255)' },
-    3360: { label: 'Black', positions: [], color: 'rgb(76, 70, 62)' },
-    351: { label: 'Orange', positions: [], color: 'rgb(255, 136, 5)' },
-    1123: { label: 'Fuchsia', positions: [], color: 'rgb(255, 85, 132)' },
-    802: { label: 'Turquoise', positions: [], color: 'rgb(0, 189, 148)' },
-    4424: { label: 'Rose', positions: [], color: 'rgb(211, 179, 176)' },
+    5915: { label: 'Pink', positions: [], color: 'rgb(223, 137, 255)' },
+    1334: { label: 'Green', positions: [], color: 'rgb(115, 192, 0)' },
+    1125: { label: 'Cian', positions: [], color: 'rgb(0, 196, 255)' },
+    624: { label: 'Black', positions: [], color: 'rgb(76, 70, 62)' },
+    584: { label: 'Orange', positions: [], color: 'rgb(255, 136, 5)' },
+    282: { label: 'Fuchsia', positions: [], color: 'rgb(255, 85, 132)' },
+    5738: { label: 'Turquoise', positions: [], color: 'rgb(0, 189, 148)' },
+    840: { label: 'Rose', positions: [], color: 'rgb(211, 179, 176)' },
   }, //objects like this: { [key: int]: Cluster }
 };
 
