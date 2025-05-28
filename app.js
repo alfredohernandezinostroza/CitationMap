@@ -8,7 +8,7 @@ import { clearFilters, updateFilter } from './table.js';
 // Load and render the GEXF file
 const graph = await load_gexf();
 clean_graph(graph);
-clean_graph(graph);
+// clean_graph(graph);
 // rotate_graph_180(graph);
 const papersTable = await create_table();
 // papersTable.getColumnDefinition("Citations")
@@ -125,17 +125,19 @@ async function load_gexf() {
 }
 
 function clean_graph(graph) {
+  graphologyLibrary.components.cropToLargestConnectedComponent(graph);
   graph.forEachNode((node) => {
     //there is a problem in which some nodes have edges towards or from nodes that are going to be deleted, thus,
     //you need to call the function twice if you want to delete all the nodes
-    if (
-      !graph.hasNodeAttribute(node, 'citationcount') ||
-      graph.getNodeAttribute(node, 'citationcount') == 0 ||
-      graph.edges(node).length == 0
-    ) {
-      graph.dropNode(node);
-      return;
-    }
+    // if (
+    //   !graph.hasNodeAttribute(node, 'citationcount') ||
+    //   graph.getNodeAttribute(node, 'citationcount') == 0 ||
+    //   graph.edges(node).length == 0
+    // ) {
+    //   graph.dropNode(node);
+    //   return;
+    // }
+
     if (!graph.hasNodeAttribute(node, 'abstract')) {
       graph.setNodeAttribute(node, 'abstract', '');
     }
