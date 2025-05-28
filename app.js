@@ -654,7 +654,6 @@ function renderCard(nodeData) {
   const abstract = nodeData.abstract ? nodeData.abstract : 'No abstract available';
   // : "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed sit amet nulla auctor, vestibulum magna sed, convallis ex. Cum sociis natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus.";
   // <p>Authors: ${nodeData.author.join(', ')}</p>
-  console.log(typeof nodeData.citationcount);
   const cardHTML = `
     <div class="close-button-card"></div>
     <div class="card-contents">
@@ -720,6 +719,11 @@ function add_labels(renderer, state, sigma_container) {
       } else {
         clusterLabel.style.display = 'block';
       }
+      if (state.hoveredNode) {
+        clusterLabel.style.opacity = 0.5;
+      } else {
+        clusterLabel.style.opacity = 1;
+      }
     }
   });
 
@@ -749,9 +753,6 @@ async function create_table() {
   // let data_for_table = graph.toJSON().nodes.map((obj) => {
   //   return Object.assign({}, obj, obj.attributes);
   // });
-  console.log(data_for_table);
-  console.log(typeof data_for_table[0].citationcount);
-
   // const widths = [
   //   '0.324492145099706%',
   //   '0.14221569322271063%',
