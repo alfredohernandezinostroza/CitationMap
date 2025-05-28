@@ -9,7 +9,7 @@ import { clearFilters, updateFilter } from './table.js';
 const graph = await load_gexf();
 clean_graph(graph);
 clean_graph(graph);
-rotate_graph_180(graph);
+// rotate_graph_180(graph);
 const papersTable = await create_table();
 // papersTable.getColumnDefinition("Citations")
 
