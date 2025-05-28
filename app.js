@@ -260,34 +260,27 @@ async function render_gexf(graph, state) {
   // Bind search input interactions:
   search_input_label.addEventListener('input', () => {
     setSearchQuery2(state, graph, renderer, search_inputs);
-    if (state.suggestions) fitViewportToNodes(renderer, Array.from(state.suggestions), { animate: true });
   });
   search_input_author.addEventListener('input', () => {
     setSearchQuery2(state, graph, renderer, search_inputs);
-    if (state.suggestions) fitViewportToNodes(renderer, Array.from(state.suggestions), { animate: true });
   });
   search_input_abstract.addEventListener('input', () => {
     setSearchQuery2(state, graph, renderer, search_inputs);
-    if (state.suggestions) fitViewportToNodes(renderer, Array.from(state.suggestions), { animate: true });
   });
   search_input_journal.addEventListener('input', () => {
     setSearchQuery2(state, graph, renderer, search_inputs);
-    if (state.suggestions) fitViewportToNodes(renderer, Array.from(state.suggestions), { animate: true });
   });
   search_input_keywords.addEventListener('input', () => {
     setSearchQuery2(state, graph, renderer, search_inputs);
-    if (state.suggestions) fitViewportToNodes(renderer, Array.from(state.suggestions), { animate: true });
   });
 
   // Bind labels threshold to range input
   minYearThresholdRange.addEventListener('input', () => {
     setSearchQuery2(state, graph, renderer, search_inputs);
-    if (state.suggestions) fitViewportToNodes(renderer, Array.from(state.suggestions), { animate: true });
     // renderer?.setSetting('labelRenderedSizeThreshold', +labelsThresholdRange.value);
   });
   maxYearThresholdRange.addEventListener('input', () => {
     setSearchQuery2(state, graph, renderer, search_inputs);
-    if (state.suggestions) fitViewportToNodes(renderer, Array.from(state.suggestions), { animate: true });
     // renderer?.setSetting('labelRenderedSizeThreshold', +labelsThresholdRange.value);
   });
 
