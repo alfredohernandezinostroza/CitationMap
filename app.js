@@ -68,6 +68,10 @@ const state = {
 };
 
 graph.forEachNode((node, atts) => {
+  // atts.size = Math.sqrt(graph.degree(node) / 50);
+  // atts.size = Math.ceil(atts.citationcount / 100);
+  atts.size = atts.size / 120;
+  // if (atts.size > 10) atts.size = 10;
   if (atts.modularity_class in state.clusters)
     state.clusters[atts.modularity_class].positions.push({ x: atts.x, y: atts.y });
   // node color depends on the cluster it belongs to
