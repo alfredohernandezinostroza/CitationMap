@@ -478,7 +478,7 @@ function setSearchQuery2(state, graph, renderer, search_inputs, checkboxes) {
     suggestions_label = graph
       .nodes()
       .map((n) => ({ id: n, prop: graph.getNodeAttribute(n, 'label') }))
-      .filter(({ prop }) => prop.toLowerCase().includes(lcQuery));
+      .filter(({ prop }) => prop?.toLowerCase().includes(lcQuery) ?? false);
     suggestions_label = new Set(suggestions_label.map(({ id }) => id));
   }
   if (query_author !== '') {
@@ -489,7 +489,7 @@ function setSearchQuery2(state, graph, renderer, search_inputs, checkboxes) {
       let suggestions = graph
         .nodes()
         .map((n) => ({ id: n, array_prop: graph.getNodeAttribute(n, 'author') }))
-        .filter(({ array_prop }) => array_prop.some((v) => v.toLowerCase().includes(lcQuery)));
+        .filter(({ array_prop }) => array_prop?.some((v) => v.toLowerCase().includes(lcQuery)) ?? false);
       suggestions_author = suggestions_author.union(new Set(suggestions.map(({ id }) => id)));
     });
   }
@@ -498,7 +498,7 @@ function setSearchQuery2(state, graph, renderer, search_inputs, checkboxes) {
     suggestions_abstract = graph
       .nodes()
       .map((n) => ({ id: n, prop: graph.getNodeAttribute(n, 'abstract') }))
-      .filter(({ prop }) => prop.toLowerCase().includes(lcQuery));
+      .filter(({ prop }) => prop?.toLowerCase().includes(lcQuery) ?? false);
     suggestions_abstract = new Set(suggestions_abstract.map(({ id }) => id));
   }
   if (query_journal !== '') {
@@ -506,7 +506,7 @@ function setSearchQuery2(state, graph, renderer, search_inputs, checkboxes) {
     suggestions_journal = graph
       .nodes()
       .map((n) => ({ id: n, prop: graph.getNodeAttribute(n, 'journal') }))
-      .filter(({ prop }) => prop.toLowerCase().includes(lcQuery));
+      .filter(({ prop }) => prop?.toLowerCase().includes(lcQuery) ?? false);
     suggestions_journal = new Set(suggestions_journal.map(({ id }) => id));
   }
   if (query_keywords !== '') {
@@ -517,7 +517,7 @@ function setSearchQuery2(state, graph, renderer, search_inputs, checkboxes) {
       let suggestions = graph
         .nodes()
         .map((n) => ({ id: n, array_prop: graph.getNodeAttribute(n, 'keywords') }))
-        .filter(({ array_prop }) => array_prop.some((v) => v.toLowerCase().includes(lcQuery)));
+        .filter(({ array_prop }) => array_prop?.some((v) => v.toLowerCase().includes(lcQuery)) ?? false);
       suggestions_keywords = suggestions_keywords.union(new Set(suggestions.map(({ id }) => id)));
     });
   }
