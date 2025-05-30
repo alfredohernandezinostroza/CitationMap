@@ -7,79 +7,13 @@
     <link rel="stylesheet" type="text/css" href="styles.css" />
   </head>
   <body>
+    <div id="selected-nodes-count" class="rounded-div">
+      <span id="selected-nodes-count-text">Nodes selected: </span>
+    </div>
     <div class="header">
       <h1>Motor Learning Citation Map</h1>
     </div>
-
-    <div class="tabs">
-      <div class="tab-header">
-        <button class="tab-button active" id="tab-button-1">Graph</button>
-        <button class="tab-button" id="tab-button-2">Table</button>
-      </div>
-      <div class="tab-content">
-        <div class="tab-pane active" id="tab-pane-1">
-          <div id="sigma-container"></div>
-          <div id="selected-nodes-count" class="rounded-div">
-            <span id="selected-nodes-count-text">Nodes selected: </span>
-          </div>
-          <div class="card-container" style="display: none"></div>
-        </div>
-        <div class="tab-pane" id="tab-pane-2">
-          <div class="table-container">
-            <div>
-              <select id="filter-field">
-                <option></option>
-                <option value="label">Paper</option>
-                <option value="author">Author</option>
-                <option value="citationcount">Citations</option>
-                <option value="date">Year</option>
-                <option value="journal">Journal</option>
-                <option value="doi">DOI</option>
-              </select>
-
-              <select id="filter-type">
-                <option value="like">Contains</option>
-                <option value="=">=</option>
-                <option value="<"><</option>
-                <option value="<="><=</option>
-                <option value=">">></option>
-                <option value=">=">>=</option>
-                <option value="!=">!=</option>
-              </select>
-
-              <input id="filter-value" type="text" placeholder="value to filter" />
-
-              <button id="filter-clear">Clear Filter</button>
-            </div>
-            <div id="top-papers-table"></div>
-          </div>
-        </div>
-        <!-- <script src="https://cdnjs.cloudflare.com/ajax/libs/graphology/0.26.0/graphology.umd.min.js"></script> -->
-        <!-- <script src="https://cdnjs.cloudflare.com/ajax/libs/graphology/0.26.0/graphology.cjs.js"></script> -->
-        <!-- <script src="https://cdn.jsdelivr.net/npm/graphology@0.25.0/dist/graphology.umd.min.js"></script> -->
-
-        <!-- //v0.25.0 -->
-        <script src="./graphology.min.js"></script>
-        <script src="./graphology-library.min.js"></script>
-
-        <!-- //v3.0.1 -->
-        <script src="./sigma.min.js"></script>
-
-        <!-- <script src="https://cdnjs.cloudflare.com/ajax/libs/sigma.js/3.0.1/sigma.min.js"></script> -->
-
-        <!-- <script type="module" src=" 	https://unpkg.com/graphology-utils@2.4.3/index.js"></script> -->
-        <!-- <script src=" https://cdn.jsdelivr.net/npm/graphology-components@1.5.4/index.min.js "></script> -->
-
-        <!-- <script src="https://cdn.jsdelivr.net/npm/graphology-gexf@0.13.2/index.min.js"></script> -->
-        <!-- <script src="https://cdn.jsdelivr.net/npm/graphology-gexf@0.13.2/browser.js"> -->
-        <script type="module" src="app.js"></script>
-        <!-- <link href="https://unpkg.com/tabulator-tables@6.3.1/dist/css/tabulator.min.css" rel="stylesheet" />
-        <script type="text/javascript" src="https://unpkg.com/tabulator-tables@6.3.1/dist/js/tabulator.min.js"></script> -->
-        <!-- //v6.3.1 -->
-        <link href="./tabulator.min.css" rel="stylesheet" />
-        <script src="./tabulator.min.js"></script>
-        <script type="module" src="table.js"></script>
-      </div>
+    <div id="filters-and-contents">
       <div id="global-filters">
         <div id="search-container">
           <div id="search">
@@ -104,10 +38,84 @@
           </div>
         </div>
         <div class="input-years">
-          <label for="year-min-threshold" id="label-min-threshold">Min year: 1900</label>
-          <input id="year-min-threshold" type="range" min="1900" max="2025" step="1" />
-          <label for="year-max-threshold" id="label-max-threshold">Max year: 2025</label>
-          <input id="year-max-threshold" type="range" min="1900" max="2025" step="1" />
+          <div id="year-min-container">
+            <label for="year-min-threshold" id="label-min-threshold">Min year: 1900</label>
+            <input id="year-min-threshold" type="range" min="1900" max="2025" step="1" />
+          </div>
+          <div id="year-min-container">
+            <label for="year-max-threshold" id="label-max-threshold">Max year: 2025</label>
+            <input id="year-max-threshold" type="range" min="1900" max="2025" step="1" />
+          </div>
+        </div>
+      </div>
+      <div id="content">
+        <div class="tabs">
+          <div class="tab-header">
+            <button class="tab-button active" id="tab-button-1">Graph</button>
+            <button class="tab-button" id="tab-button-2">Table</button>
+          </div>
+
+          <div class="tab-content">
+            <div class="tab-pane active" id="tab-pane-1">
+              <div id="sigma-container"></div>
+              <div class="card-container" style="display: none"></div>
+            </div>
+            <div class="tab-pane" id="tab-pane-2">
+              <div class="table-container">
+                <div>
+                  <select id="filter-field">
+                    <option></option>
+                    <option value="label">Paper</option>
+                    <option value="author">Author</option>
+                    <option value="citationcount">Citations</option>
+                    <option value="date">Year</option>
+                    <option value="journal">Journal</option>
+                    <option value="doi">DOI</option>
+                  </select>
+
+                  <select id="filter-type">
+                    <option value="like">Contains</option>
+                    <option value="=">=</option>
+                    <option value="<"><</option>
+                    <option value="<="><=</option>
+                    <option value=">">></option>
+                    <option value=">=">>=</option>
+                    <option value="!=">!=</option>
+                  </select>
+
+                  <input id="filter-value" type="text" placeholder="value to filter" />
+
+                  <button id="filter-clear">Clear Filter</button>
+                </div>
+                <div id="top-papers-table"></div>
+              </div>
+            </div>
+            <!-- <script src="https://cdnjs.cloudflare.com/ajax/libs/graphology/0.26.0/graphology.umd.min.js"></script> -->
+            <!-- <script src="https://cdnjs.cloudflare.com/ajax/libs/graphology/0.26.0/graphology.cjs.js"></script> -->
+            <!-- <script src="https://cdn.jsdelivr.net/npm/graphology@0.25.0/dist/graphology.umd.min.js"></script> -->
+
+            <!-- //v0.25.0 -->
+            <script src="./graphology.min.js"></script>
+            <script src="./graphology-library.min.js"></script>
+
+            <!-- //v3.0.1 -->
+            <script src="./sigma.min.js"></script>
+
+            <!-- <script src="https://cdnjs.cloudflare.com/ajax/libs/sigma.js/3.0.1/sigma.min.js"></script> -->
+
+            <!-- <script type="module" src=" 	https://unpkg.com/graphology-utils@2.4.3/index.js"></script> -->
+            <!-- <script src=" https://cdn.jsdelivr.net/npm/graphology-components@1.5.4/index.min.js "></script> -->
+
+            <!-- <script src="https://cdn.jsdelivr.net/npm/graphology-gexf@0.13.2/index.min.js"></script> -->
+            <!-- <script src="https://cdn.jsdelivr.net/npm/graphology-gexf@0.13.2/browser.js"> -->
+            <script type="module" src="app.js"></script>
+            <!-- <link href="https://unpkg.com/tabulator-tables@6.3.1/dist/css/tabulator.min.css" rel="stylesheet" />
+        <script type="text/javascript" src="https://unpkg.com/tabulator-tables@6.3.1/dist/js/tabulator.min.js"></script> -->
+            <!-- //v6.3.1 -->
+            <link href="./tabulator.min.css" rel="stylesheet" />
+            <script src="./tabulator.min.js"></script>
+            <script type="module" src="table.js"></script>
+          </div>
         </div>
       </div>
     </div>

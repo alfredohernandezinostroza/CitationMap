@@ -736,9 +736,9 @@ function add_labels(renderer, state, sigma_container) {
     }
   });
 
-  const clusterLabelsRow = document.createElement('div');
-  clusterLabelsRow.className = 'cluster-labels-row';
-  document.querySelector('#global-filters').prepend(clusterLabelsRow);
+  const clusterLabelsSection = document.createElement('div');
+  clusterLabelsSection.className = 'cluster-labels-section';
+  document.querySelector('#global-filters').prepend(clusterLabelsSection);
 
   for (const cluster in state.clusters) {
     const checkbox = document.createElement('input');
@@ -748,8 +748,11 @@ function add_labels(renderer, state, sigma_container) {
     const label = document.createElement('label');
     label.textContent = state.clusters[cluster].label;
     label.htmlFor = `cluster-${cluster}`;
+    const clusterLabelsRow = document.createElement('div');
+    clusterLabelsRow.className = 'cluster-labels-row';
     clusterLabelsRow.appendChild(checkbox);
     clusterLabelsRow.appendChild(label);
+    clusterLabelsSection.appendChild(clusterLabelsRow);
   }
 }
 
@@ -772,15 +775,25 @@ async function create_table() {
   //   '0.14370128376466482%',
   // ];
 
-  const widths = [324, 142, 54, 51, 142, 142, 143.48333740234375];
+  // const widths = [324, 142, 54, 51, 142, 142, 143.48333740234375];
+  const widths = [324, 113.6, 43.2, 40.8, 113.6, 113.6, 114.786669921875];
   const papersTable = new Tabulator('#top-papers-table', {
     data: data_for_table,
-    // layout: 'fitDataStretch',
+    // layout: 'fitData',
     layout: 'fitColumns',
     // autoColumns: true,
     pagination: 'local', // enable local pagination
     paginationSize: 10, // show 10 rows per page
     paginationSizeSelector: [5, 10, 20, 50], // optional page size selector
+    // columns: [
+    //   { title: 'Paper', field: 'label', width: widths[0] },
+    //   { title: 'Authors', field: 'author', width: widths[1] },
+    //   { title: 'Citations', field: 'citationcount', sorter: 'number', width: widths[2] },
+    //   { title: 'Year', field: 'date', sorter: 'number', width: widths[3] },
+    //   { title: 'Journal', field: 'journal', width: widths[4] },
+    //   { title: 'Link', field: 'link', formatter: 'link', formatterParams: { target: '_blank' }, width: widths[5] },
+    //   { title: 'Doi', field: 'doi', width: widths[6] },
+    // ],
     columns: [
       { title: 'Paper', field: 'label', width: widths[0] },
       { title: 'Authors', field: 'author', width: widths[1] },
