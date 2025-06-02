@@ -101,6 +101,7 @@ graph.forEachNode((node, atts) => {
   // // node size depends on its degree
   // store cluster's nodes positions to calculate cluster label position
 });
+rotate_graph_180(graph);
 
 graph.forEachEdge((edge, _attributes, _source, _target, sourceAttributes) => {
   graph.setEdgeAttribute(edge, 'color', sourceAttributes.color);
@@ -108,9 +109,9 @@ graph.forEachEdge((edge, _attributes, _source, _target, sourceAttributes) => {
 
 for (const key in state.clusters) {
   state.clusters[key].x =
-    state.clusters[key].positions.reduce((acc, p) => acc + p.x, 0) / state.clusters[key].positions.length;
+    -state.clusters[key].positions.reduce((acc, p) => acc + p.x, 0) / state.clusters[key].positions.length;
   state.clusters[key].y =
-    state.clusters[key].positions.reduce((acc, p) => acc + p.y, 0) / state.clusters[key].positions.length;
+    -state.clusters[key].positions.reduce((acc, p) => acc + p.y, 0) / state.clusters[key].positions.length;
 }
 
 try {
