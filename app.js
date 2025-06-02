@@ -126,8 +126,6 @@ try {
 // fitViewportToNodes(renderer, graph.nodes(), { animate: true });
 
 async function load_gexf() {
-  let renderer = null;
-
   // Add a loading indicator
   const loadingIndicator = document.createElement('div');
   loadingIndicator.textContent = 'Loading graph...';
@@ -147,7 +145,7 @@ async function load_gexf() {
     loadingIndicator.style.display = 'none';
   }, 4000);
 
-  const graph = parse(window.graphology, to_parse);
+  const graph = parse(window.graphology, to_parse, { addMissingNodes: true });
   return graph;
 }
 
