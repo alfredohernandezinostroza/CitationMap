@@ -163,6 +163,10 @@ function clean_graph(graph) {
     //   return;
     // }
 
+    if (graph.getNodeAttribute(node, 'label').slice(0, 3) == '10.') {
+      graph.dropNode(node);
+      return;
+    }
     if (!graph.hasNodeAttribute(node, 'abstract')) {
       graph.setNodeAttribute(node, 'abstract', '');
     }
