@@ -55,6 +55,7 @@ const state = {
   suggestions: undefined, //new Set()
   query_label: '',
   query_author: '',
+  showLabels: true,
   clusters: {
     5915: { label: 'Motor Cortex', positions: [], color: 'rgb(223, 137, 255)' },
     1334: { label: 'Adaptation', positions: [], color: 'rgb(115, 192, 0)' },
@@ -72,7 +73,7 @@ const state = {
 graph.forEachNode((node, atts) => {
   // atts.size = Math.sqrt(graph.degree(node) / 50);
   // atts.size = Math.ceil(atts.citationcount / 100);
-  atts.size = atts.size / 120;
+  atts.size = atts.size / 90;
   if (atts.size < 1) atts.size = Math.sqrt(atts.size);
   if (
     !(atts.modularity_class in state.clusters) &&
@@ -330,6 +331,20 @@ async function render_gexf(graph, state) {
   } catch (error) {
     console.error('Error binding graph interactions:', error);
   }
+  const checkbox_labels = document.getElementById('show-labels-checkbox-input');
+  console.log(checkbox_labels);
+  checkbox_labels.addEventListener('change', () => {
+    if (checkbox_labels.checked) {
+      state.showLabels = true;
+      console.log(state.showLabels);
+    } else {
+      state.showLabels = false;
+      console.log(state.showLabels);
+    }
+    renderer.refresh({
+      skipIndexation: true,
+    });
+  });
   //Bind click behavior
   renderer.on('clickNode', ({ node }) => {
     const nodeData = graph.getNodeAttributes(node);
@@ -746,7 +761,7 @@ function add_labels(renderer, state, sigma_container) {
         clusterLabel.style.top = `${viewportPos.y}px`;
         clusterLabel.style.left = `${viewportPos.x}px`;
       }
-      if (!checked_mod_classes.includes(key)) {
+      if (!checked_mod_classes.includes(key) || !state.showLabels) {
         clusterLabel.style.display = 'none';
       } else {
         clusterLabel.style.display = 'block';
@@ -773,7 +788,7 @@ function add_labels(renderer, state, sigma_container) {
     label.htmlFor = `cluster-${cluster}`;
     const clusterLabelsRow = document.createElement('div');
     clusterLabelsRow.className = 'cluster-labels-row';
-    clusterLabelsRow.appendChild(checkbox);
+    label.prepend(checkbox);
     clusterLabelsRow.appendChild(label);
     clusterLabelsSection.appendChild(clusterLabelsRow);
   }
