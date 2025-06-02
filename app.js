@@ -5,6 +5,9 @@ import { fitViewportToNodes } from './utils.js';
 import { clearFilters, updateFilter } from './table.js';
 // import Sigma from 'https://cdn.skypack.dev/sigma';
 
+const loadingAnimation = document.getElementById('loading-animation');
+
+loadingAnimation.classList.add('show');
 // Load and render the GEXF file
 const graph = await load_gexf();
 clean_graph(graph);
@@ -118,11 +121,14 @@ const angle = Math.PI / 10;
 rotate_graph_n(graph, angle);
 rotate_labels(state, angle);
 
+// loadingAnimation.style.display = 'block';
 try {
   renderer = await render_gexf(graph, state); //.catch(error => console.error('Error rendering gexf', error));
 } catch (error) {
   console.error('Error rendering gexf', error);
 }
+
+loadingAnimation.classList.remove('show');
 // fitViewportToNodes(renderer, graph.nodes(), { animate: true });
 
 async function load_gexf() {
@@ -311,7 +317,10 @@ async function render_gexf(graph, state) {
 
   // Bind search input interactions:
   search_input_label.addEventListener('input', () => {
+    const loadingAnimation = document.getElementById('loading-animation');
+    // loadingAnimation.classList.add('show');
     setSearchQuery2(state, graph, renderer, search_inputs);
+    // loadingAnimation.classList.remove('show');
   });
   search_input_author.addEventListener('input', () => {
     setSearchQuery2(state, graph, renderer, search_inputs);
