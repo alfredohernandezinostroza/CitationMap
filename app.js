@@ -56,14 +56,16 @@ const state = {
   query_label: '',
   query_author: '',
   clusters: {
-    5915: { label: 'Pink', positions: [], color: 'rgb(223, 137, 255)' },
-    1334: { label: 'Green', positions: [], color: 'rgb(115, 192, 0)' },
-    1125: { label: 'Cian', positions: [], color: 'rgb(0, 196, 255)' },
-    624: { label: 'Black', positions: [], color: 'rgb(76, 70, 62)' },
-    584: { label: 'Orange', positions: [], color: 'rgb(255, 136, 5)' },
-    282: { label: 'Fuchsia', positions: [], color: 'rgb(255, 85, 132)' },
-    5738: { label: 'Turquoise', positions: [], color: 'rgb(0, 189, 148)' },
-    840: { label: 'Rose', positions: [], color: 'rgb(211, 179, 176)' },
+    5915: { label: 'Motor Cortex', positions: [], color: 'rgb(223, 137, 255)' },
+    1334: { label: 'Adaptation', positions: [], color: 'rgb(115, 192, 0)' },
+    1125: { label: 'Other Applied', positions: [], color: 'rgb(0, 196, 255)' },
+    624: { label: 'Sequence Learning', positions: [], color: 'rgb(76, 70, 62)' },
+    584: { label: 'Cerebellum', positions: [], color: 'rgb(255, 136, 5)' },
+    282: { label: 'Feedback/Rehabilitation', positions: [], color: 'rgb(255, 85, 132)' },
+    5738: { label: 'Attention/Motivation', positions: [], color: 'rgb(0, 189, 148)' },
+    840: { label: 'Observational Practice', positions: [], color: 'rgb(211, 179, 176)' },
+    1: { label: 'Cognitive approach', positions: [], color: 'rgb(209, 17, 0)' },
+    2: { label: 'Basal Ganglia', positions: [], color: 'rgb(165, 73, 241)' },
   }, //objects like this: { [key: int]: Cluster }
 };
 
@@ -71,7 +73,27 @@ graph.forEachNode((node, atts) => {
   // atts.size = Math.sqrt(graph.degree(node) / 50);
   // atts.size = Math.ceil(atts.citationcount / 100);
   atts.size = atts.size / 120;
-  // if (atts.size > 10) atts.size = 10;
+  if (atts.size < 1) atts.size = Math.sqrt(atts.size);
+  if (
+    !(atts.modularity_class in state.clusters) &&
+    atts.x > -9112.981 &&
+    atts.x < -2971 &&
+    atts.y > -6557.1426 &&
+    atts.y < -3100
+  ) {
+    atts.modularity_class = 1;
+    atts.color = state.clusters[atts.modularity_class].color;
+  }
+  if (
+    !(atts.modularity_class in state.clusters) &&
+    atts.x > 6417.777 &&
+    atts.x < 10697.865 &&
+    atts.y > 3102.0493 &&
+    atts.y < 6008.047
+  ) {
+    atts.modularity_class = 2;
+    atts.color = state.clusters[atts.modularity_class].color;
+  }
   if (atts.modularity_class in state.clusters)
     state.clusters[atts.modularity_class].positions.push({ x: atts.x, y: atts.y });
   // node color depends on the cluster it belongs to
