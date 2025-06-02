@@ -73,7 +73,7 @@ const state = {
 graph.forEachNode((node, atts) => {
   // atts.size = Math.sqrt(graph.degree(node) / 50);
   // atts.size = Math.ceil(atts.citationcount / 100);
-  atts.size = atts.size / 90;
+  atts.size = atts.size / 85;
   if (atts.size < 1) atts.size = Math.sqrt(atts.size);
   if (
     !(atts.modularity_class in state.clusters) &&
@@ -114,6 +114,9 @@ for (const key in state.clusters) {
   state.clusters[key].y =
     -state.clusters[key].positions.reduce((acc, p) => acc + p.y, 0) / state.clusters[key].positions.length;
 }
+const angle = Math.PI / 10;
+rotate_graph_n(graph, angle);
+rotate_labels(state, angle);
 
 try {
   renderer = await render_gexf(graph, state); //.catch(error => console.error('Error rendering gexf', error));
@@ -187,6 +190,23 @@ function rotate_graph_180(graph) {
     graph.updateNodeAttribute(node, 'x', (x) => -x);
     graph.updateNodeAttribute(node, 'y', (y) => -y);
   });
+}
+function rotate_graph_n(graph, n) {
+  graph.forEachNode((node) => {
+    const x_old = graph.getNodeAttribute(node, 'x');
+    const y_old = graph.getNodeAttribute(node, 'y');
+    graph.updateNodeAttribute(node, 'x', (x) => Math.cos(n) * x + Math.sin(n) * y_old);
+    graph.updateNodeAttribute(node, 'y', (y) => -Math.sin(n) * x_old + Math.cos(n) * y);
+  });
+}
+function rotate_labels(state, n) {
+  for (const key in state.clusters) {
+    const cluster = state.clusters[key];
+    const x_old = cluster.x;
+    const y_old = cluster.y;
+    cluster.x = Math.cos(n) * x_old + Math.sin(n) * y_old;
+    cluster.y = -Math.sin(n) * x_old + Math.cos(n) * y_old;
+  }
 }
 
 async function render_gexf(graph, state) {
@@ -399,7 +419,7 @@ function bind_graph_interactions(renderer, state) {
   // Edge reducer with hover functionality
   renderer.setSetting('edgeReducer', function (edge, data) {
     const res = { ...data };
-    res.size = 0.05; // Base edge width
+    res.size = 0.09; // Base edge width
     if (
       state.hoveredNode &&
       !graph.extremities(edge).every((n) => n === state.hoveredNode || graph.areNeighbors(n, state.hoveredNode))
