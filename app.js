@@ -4,7 +4,6 @@ import { parse } from 'https://cdn.skypack.dev/graphology-gexf/browser';
 import { fitViewportToNodes } from './utils.js';
 import { clearFilters, updateFilter } from './table.js';
 // import Sigma from 'https://cdn.skypack.dev/sigma';
-
 const loadingAnimation = document.getElementById('loading-animation');
 
 loadingAnimation.classList.add('show');
