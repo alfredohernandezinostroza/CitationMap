@@ -10,8 +10,6 @@ loadingAnimation.classList.add('show');
 // Load and render the GEXF file
 const graph = await load_gexf();
 clean_graph(graph);
-// clean_graph(graph);
-// rotate_graph_180(graph);
 const papersTable = await create_table();
 // papersTable.getColumnDefinition("Citations")
 
@@ -59,16 +57,76 @@ const state = {
   query_author: '',
   showLabels: true,
   clusters: {
-    5915: { label: 'Motor Cortex', positions: [], color: 'rgb(223, 137, 255)' },
-    1334: { label: 'Adaptation', positions: [], color: 'rgb(115, 192, 0)' },
-    1125: { label: 'Other Applied', positions: [], color: 'rgb(0, 196, 255)' },
-    624: { label: 'Sequence Learning', positions: [], color: 'rgb(76, 70, 62)' },
-    584: { label: 'Cerebellum', positions: [], color: 'rgb(255, 136, 5)' },
-    282: { label: 'Feedback/Rehabilitation', positions: [], color: 'rgb(255, 85, 132)' },
-    5738: { label: 'Attention/Motivation', positions: [], color: 'rgb(0, 189, 148)' },
-    840: { label: 'Observational Practice', positions: [], color: 'rgb(211, 179, 176)' },
-    1: { label: 'Cognitive approach', positions: [], color: 'rgb(209, 17, 0)' },
-    2: { label: 'Basal Ganglia', positions: [], color: 'rgb(165, 73, 241)' },
+    5915: {
+      displaylabel: 'Motor\nCortex',
+      label: 'Motor Cortex',
+      positions: [],
+      color: 'rgb(223, 137, 255)',
+      bias: { x: 0, y: 0 },
+    },
+    1334: {
+      displaylabel: 'Adaptation',
+      label: 'Adaptation',
+      positions: [],
+      color: 'rgb(115, 192, 0)',
+      bias: { x: 0, y: 0 },
+    },
+    1125: {
+      displaylabel: 'Other Applied',
+      label: 'Other Applied',
+      positions: [],
+      color: 'rgb(0, 196, 255)',
+      bias: { x: 3000, y: 300 },
+    },
+    624: {
+      displaylabel: 'Sequence\nLearning',
+      label: 'Sequence Learning',
+      positions: [],
+      color: 'rgb(76, 70, 62)',
+      bias: { x: 0, y: 0 },
+    },
+    584: {
+      displaylabel: 'Cerebellum',
+      label: 'Cerebellum',
+      positions: [],
+      color: 'rgb(255, 136, 5)',
+      bias: { x: 0, y: 0 },
+    },
+    282: {
+      displaylabel: 'Feedback/\nRehabilitation',
+      label: 'Feedback/Rehabilitation',
+      positions: [],
+      color: 'rgb(255, 85, 132)',
+      bias: { x: 0, y: 0 },
+    },
+    5738: {
+      displaylabel: 'Attention/Motivation',
+      label: 'Attention/Motivation',
+      positions: [],
+      color: 'rgb(0, 189, 148)',
+      bias: { x: 200, y: -1000 },
+    },
+    840: {
+      displaylabel: 'Observational\nPractice',
+      label: 'Observational Practice',
+      positions: [],
+      color: 'rgb(211, 179, 176)',
+      bias: { x: 0, y: 0 },
+    },
+    1: {
+      displaylabel: 'Cognitive approach',
+      label: 'Cognitive approach',
+      positions: [],
+      color: 'rgb(209, 17, 0)',
+      bias: { x: 0, y: 0 },
+    },
+    2: {
+      displaylabel: 'Basal Ganglia',
+      label: 'Basal Ganglia',
+      positions: [],
+      color: 'rgb(165, 73, 241)',
+      bias: { x: 0, y: 0 },
+    },
   }, //objects like this: { [key: int]: Cluster }
 };
 
@@ -104,7 +162,6 @@ graph.forEachNode((node, atts) => {
   // // node size depends on its degree
   // store cluster's nodes positions to calculate cluster label position
 });
-rotate_graph_180(graph);
 
 graph.forEachEdge((edge, _attributes, _source, _target, sourceAttributes) => {
   graph.setEdgeAttribute(edge, 'color', sourceAttributes.color);
@@ -112,13 +169,18 @@ graph.forEachEdge((edge, _attributes, _source, _target, sourceAttributes) => {
 
 for (const key in state.clusters) {
   state.clusters[key].x =
-    -state.clusters[key].positions.reduce((acc, p) => acc + p.x, 0) / state.clusters[key].positions.length;
+    state.clusters[key].positions.reduce((acc, p) => acc + p.x, 0) / state.clusters[key].positions.length;
   state.clusters[key].y =
-    -state.clusters[key].positions.reduce((acc, p) => acc + p.y, 0) / state.clusters[key].positions.length;
+    state.clusters[key].positions.reduce((acc, p) => acc + p.y, 0) / state.clusters[key].positions.length;
 }
-const angle = Math.PI / 10;
+const angle = Math.PI + Math.PI / 10;
 rotate_graph_n(graph, angle);
 rotate_labels(state, angle);
+
+for (const key in state.clusters) {
+  state.clusters[key].x += state.clusters[key].bias.x;
+  state.clusters[key].y += state.clusters[key].bias.y;
+}
 
 // loadingAnimation.style.display = 'block';
 try {
@@ -391,7 +453,8 @@ async function render_gexf(graph, state) {
 
   renderer
     .getCamera()
-    .setState({ x: 0.5177388063772427, y: 0.46557488233757816, angle: 0, ratio: 0.29972943598335855 });
+    // .setState({ x: 0.5177388063772427, y: 0.46557488233757816, angle: 50, ratio: 0.29972943598335855 });
+    .setState({ x: 0.3507809854983921, y: 0.5799020634539014, angle: 0, ratio: 0.39972943598335855 });
   return renderer;
 }
 
@@ -771,7 +834,9 @@ function add_labels(renderer, state, sigma_container) {
     const cluster = state.clusters[key];
     // adapt the position to viewport coordinates
     const viewportPos = renderer.graphToViewport(cluster);
-    clusterLabelsDoms += `<div id='${cluster.label}' class="clusterLabel" style="top:${viewportPos.y}px;left:${viewportPos.x}px;color:${cluster.color}">${cluster.label}</div>`;
+    viewportPos.x += cluster.bias.x;
+    viewportPos.y += cluster.bias.y;
+    clusterLabelsDoms += `<div id='${cluster.label}' class="clusterLabel" style="top:${viewportPos.y}px;left:${viewportPos.x}px;color:${cluster.color}">${cluster.displaylabel}</div>`;
   }
   clustersLayer.innerHTML = clusterLabelsDoms;
 
@@ -790,6 +855,11 @@ function add_labels(renderer, state, sigma_container) {
         const viewportPos = renderer.graphToViewport(cluster);
         clusterLabel.style.top = `${viewportPos.y}px`;
         clusterLabel.style.left = `${viewportPos.x}px`;
+        clusterLabel.style.fontSize = `${0.7 / Math.sqrt(renderer.getCamera().ratio)}rem`;
+        // clusterLabel.style.fontSize = `1.4rem`;
+        // const currentTransform = window.getComputedStyle(clusterLabel).transform;
+        // clusterLabel.style.transform = `scale(${1 / (renderer.getCamera().ratio * 1)})`;
+        // clusterLabel.style.fontSize = `${1.x}px`;
       }
       if (!checked_mod_classes.includes(key) || !state.showLabels) {
         clusterLabel.style.display = 'none';

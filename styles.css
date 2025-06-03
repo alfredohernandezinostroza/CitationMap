@@ -216,6 +216,8 @@ body {
   font-weight: 400;
   font-size: 1.4rem;
   text-shadow: 2px 2px 1px white, -2px -2px 1px white, -2px 2px 1px white, 2px -2px 1px white;
+  white-space: break-spaces;
+  text-align: center;
 }
 .cluster-labels-row {
   display: flex;
