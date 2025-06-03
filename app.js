@@ -32,20 +32,6 @@ document.getElementById('filter-clear').addEventListener('click', () => {
 
 let renderer = null;
 
-// const tabButtons = document.querySelectorAll('.tab-button');
-// const tabPanes = document.querySelectorAll('.tab-pane');
-// console.log(tabButtons);
-// console.log(tabPanes);
-
-// tabButtons.forEach((button, index) => {
-//   button.addEventListener('click', () => {
-//     console.log(`removed active class from button ${index}`);
-//     tabButtons.forEach((button) => button.classList.remove('active'));
-//     button.classList.add('active');
-//     tabPanes.forEach((pane) => pane.classList.remove('active'));
-//     tabPanes[index].classList.add('active');
-//   });
-// });
 // Define state for hover interactions
 const state = {
   hoveredNode: undefined,
@@ -131,8 +117,6 @@ const state = {
 };
 
 graph.forEachNode((node, atts) => {
-  // atts.size = Math.sqrt(graph.degree(node) / 50);
-  // atts.size = Math.ceil(atts.citationcount / 100);
   atts.size = atts.size / 85;
   if (atts.size < 1) atts.size = Math.sqrt(atts.size);
   if (
@@ -157,10 +141,6 @@ graph.forEachNode((node, atts) => {
   }
   if (atts.modularity_class in state.clusters)
     state.clusters[atts.modularity_class].positions.push({ x: atts.x, y: atts.y });
-  // node color depends on the cluster it belongs to
-  // atts.color = cluster.color;
-  // // node size depends on its degree
-  // store cluster's nodes positions to calculate cluster label position
 });
 
 graph.forEachEdge((edge, _attributes, _source, _target, sourceAttributes) => {
@@ -174,6 +154,7 @@ for (const key in state.clusters) {
     state.clusters[key].positions.reduce((acc, p) => acc + p.y, 0) / state.clusters[key].positions.length;
 }
 const angle = Math.PI + Math.PI / 10;
+//this could be avoided by simply rotating the graph
 rotate_graph_n(graph, angle);
 rotate_labels(state, angle);
 
@@ -182,9 +163,8 @@ for (const key in state.clusters) {
   state.clusters[key].y += state.clusters[key].bias.y;
 }
 
-// loadingAnimation.style.display = 'block';
 try {
-  renderer = await render_gexf(graph, state); //.catch(error => console.error('Error rendering gexf', error));
+  renderer = await render_gexf(graph, state);
 } catch (error) {
   console.error('Error rendering gexf', error);
 }
@@ -199,10 +179,7 @@ async function load_gexf() {
   loadingIndicator.style.margin = '10px';
   document.querySelector('.header').appendChild(loadingIndicator);
 
-  // let res = await fetch('./MotorLearning.gexf');
   let res = await fetch('./all.gexf');
-  // let res = await fetch('./just_center.gexf');
-  // let res = await fetch("./with_list_authors_deleted_outside_bounds.gexf");
   let to_parse = await res.text();
 
   // Hide loading indicator
@@ -229,7 +206,7 @@ function clean_graph(graph) {
     //   graph.dropNode(node);
     //   return;
     // }
-
+    // drop nodes that start with '10.', they are DOI duplicates lower (or uppercase) versions
     if (graph.getNodeAttribute(node, 'label').slice(0, 3) == '10.') {
       graph.dropNode(node);
       return;
@@ -378,10 +355,7 @@ async function render_gexf(graph, state) {
 
   // Bind search input interactions:
   search_input_label.addEventListener('input', () => {
-    const loadingAnimation = document.getElementById('loading-animation');
-    // loadingAnimation.classList.add('show');
     setSearchQuery2(state, graph, renderer, search_inputs);
-    // loadingAnimation.classList.remove('show');
   });
   search_input_author.addEventListener('input', () => {
     setSearchQuery2(state, graph, renderer, search_inputs);
@@ -399,11 +373,9 @@ async function render_gexf(graph, state) {
   // Bind labels threshold to range input
   minYearThresholdRange.addEventListener('input', () => {
     setSearchQuery2(state, graph, renderer, search_inputs);
-    // renderer?.setSetting('labelRenderedSizeThreshold', +labelsThresholdRange.value);
   });
   maxYearThresholdRange.addEventListener('input', () => {
     setSearchQuery2(state, graph, renderer, search_inputs);
-    // renderer?.setSetting('labelRenderedSizeThreshold', +labelsThresholdRange.value);
   });
 
   const checkboxes = Array.from(document.querySelectorAll('input[type="checkbox"][id^="cluster"]'));
@@ -451,10 +423,7 @@ async function render_gexf(graph, state) {
     setHoveredNode(undefined);
   });
 
-  renderer
-    .getCamera()
-    // .setState({ x: 0.5177388063772427, y: 0.46557488233757816, angle: 50, ratio: 0.29972943598335855 });
-    .setState({ x: 0.3507809854983921, y: 0.5799020634539014, angle: 0, ratio: 0.39972943598335855 });
+  renderer.getCamera().setState({ x: 0.3507809854983921, y: 0.5799020634539014, angle: 0, ratio: 0.39972943598335855 });
   return renderer;
 }
 
@@ -710,77 +679,8 @@ function setSearchQuery2(state, graph, renderer, search_inputs, checkboxes) {
   });
 }
 
-function setSearchQueryMulti(state, search_input, property, graph, renderer, search_inputs) {
-  // function setSearchQuery(query, state, search_input, graph, renderer) {
-  // state.searchQuery = query;
-
-  //   if (search_input.value !== query){
-  //     search_input.value = query
-  //     console.log(`${query} vs ${search_input.value}`);
-  // }
-  const suggestions_array = [undefined, undefined];
-  const properties = ['label', 'author'];
-  search_inputs.forEach((search_input, i) => {
-    const query = search_input.value;
-    if (query !== '') {
-      const lcQuery = query.toLowerCase();
-      const suggestions = graph
-        .nodes()
-        .map((n) => ({ id: n, prop: graph.getNodeAttribute(n, properties[i]) }))
-        .filter(({ prop }) => {
-          if (Array.isArray(prop)) {
-            prop.some((v) => v.toLowerCase().includes(lcQuery));
-          } else {
-            prop.toLowerCase().includes(lcQuery);
-          }
-        });
-      // If we have a single perfect match, them we remove the suggestions, and
-      // we consider the user has selected a node through the datalist
-      // autocomplete:
-      if (suggestions.length === 1 && suggestions[0].label === query) {
-        state.selectedNode = suggestions[0].id;
-        state.suggestions = undefined;
-
-        // Move the camera to center it on the selected node:
-        const nodePosition = renderer.getNodeDisplayData(state.selectedNode);
-        renderer.getCamera().animate(nodePosition, {
-          duration: 500,
-        });
-      }
-      // Else, we display the suggestions list:
-      else {
-        state.selectedNode = undefined;
-        suggestions_array[i] = new Set(suggestions.map(({ id }) => id));
-        // state.suggestions = new Set(suggestions.map(({ id }) => id));
-      }
-    }
-    // If the query is empty, then we reset the selectedNode / suggestions state:
-    else {
-      state.selectedNode = undefined;
-      suggestions_array[i] = undefined;
-      // state.suggestions = undefined;
-    }
-  });
-  // console.log(`label: ${Boolean(suggestions_array[0])}, author: ${Boolean(suggestions_array[1])}`);
-  if (suggestions_array[0] && suggestions_array[1])
-    state.suggestions = suggestions_array[0].union(suggestions_array[1]);
-  else if (suggestions_array[0]) state.suggestions = suggestions_array[0];
-  else if (suggestions_array[1]) state.suggestions = suggestions_array[1];
-  else state.suggestions = undefined;
-  // console.log(state.suggestions);
-  // Refresh rendering
-  // You can directly call `renderer.refresh()`, but if you need performances
-  // you can provide some options to the refresh method.
-  // In this case, we don't touch the graph data so we can skip its reindexation
-  renderer.refresh({
-    skipIndexation: true,
-  });
-}
-
 function renderCard(nodeData) {
-  // console.log(nodeData)
   const cardContainer = document.querySelector('.card-container');
-  // const buttonDiv = document.createElement("div");
 
   cardContainer.style.display = 'block';
 
@@ -792,8 +692,6 @@ function renderCard(nodeData) {
   });
 
   const abstract = nodeData.abstract ? nodeData.abstract : 'No abstract available';
-  // : "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed sit amet nulla auctor, vestibulum magna sed, convallis ex. Cum sociis natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus.";
-  // <p>Authors: ${nodeData.author.join(', ')}</p>
   const cardHTML = `
     <div class="close-button-card"></div>
     <div class="card-contents">
@@ -856,10 +754,6 @@ function add_labels(renderer, state, sigma_container) {
         clusterLabel.style.top = `${viewportPos.y}px`;
         clusterLabel.style.left = `${viewportPos.x}px`;
         clusterLabel.style.fontSize = `${0.7 / Math.sqrt(renderer.getCamera().ratio)}rem`;
-        // clusterLabel.style.fontSize = `1.4rem`;
-        // const currentTransform = window.getComputedStyle(clusterLabel).transform;
-        // clusterLabel.style.transform = `scale(${1 / (renderer.getCamera().ratio * 1)})`;
-        // clusterLabel.style.fontSize = `${1.x}px`;
       }
       if (!checked_mod_classes.includes(key) || !state.showLabels) {
         clusterLabel.style.display = 'none';
@@ -900,20 +794,6 @@ async function create_table() {
     delete res.attributes;
     return res;
   });
-  // let data_for_table = graph.toJSON().nodes.map((obj) => {
-  //   return Object.assign({}, obj, obj.attributes);
-  // });
-  // const widths = [
-  //   '0.324492145099706%',
-  //   '0.14221569322271063%',
-  //   '0.05408202418328433%',
-  //   '0.051077467284212974%',
-  //   '0.14221569322271063%',
-  //   '0.14221569322271063%',
-  //   '0.14370128376466482%',
-  // ];
-
-  // const widths = [324, 142, 54, 51, 142, 142, 143.48333740234375];
   const widths = [324, 113.6, 43.2, 40.8, 113.6, 113.6, 114.786669921875];
   const papersTable = new Tabulator('#top-papers-table', {
     data: data_for_table,
@@ -922,16 +802,7 @@ async function create_table() {
     // autoColumns: true,
     pagination: 'local', // enable local pagination
     paginationSize: 10, // show 10 rows per page
-    paginationSizeSelector: [5, 10, 20, 50], // optional page size selector
-    // columns: [
-    //   { title: 'Paper', field: 'label', width: widths[0] },
-    //   { title: 'Authors', field: 'author', width: widths[1] },
-    //   { title: 'Citations', field: 'citationcount', sorter: 'number', width: widths[2] },
-    //   { title: 'Year', field: 'date', sorter: 'number', width: widths[3] },
-    //   { title: 'Journal', field: 'journal', width: widths[4] },
-    //   { title: 'Link', field: 'link', formatter: 'link', formatterParams: { target: '_blank' }, width: widths[5] },
-    //   { title: 'Doi', field: 'doi', width: widths[6] },
-    // ],
+    paginationSizeSelector: [5, 10, 20, 50], //  page size selector
     columns: [
       { title: 'Paper', field: 'label', width: widths[0] },
       { title: 'Authors', field: 'author', width: widths[1] },
@@ -970,9 +841,6 @@ async function create_table() {
     tabPane1.classList.remove('active');
     tabPane2.classList.add('active');
   });
-
-  // console.log(`formatter: ${papersTable.getColumnDefinition('Citations').formatter}`);
-  // console.log(`type: ${papersTable.getColumnDefinition('Citations').type}`);
 
   return papersTable;
 }
