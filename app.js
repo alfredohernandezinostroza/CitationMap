@@ -361,7 +361,7 @@ async function render_gexf(graph, state) {
   const renderer = new window.Sigma(graph, sigma_container, {
     zoomToSizeRatioFunction: (value) => value,
     minEdgeThickness: 0,
-    enableCameraRotation: false,
+    enableCameraRotation: true,
     minCameraRatio: 0.08,
     maxCameraRatio: 3,
     renderLabels: false,
