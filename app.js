@@ -117,46 +117,53 @@ const state = {
 };
 
 graph.forEachNode((node, atts) => {
-  atts.size = atts.size / 85;
-  if (atts.size < 1) atts.size = Math.sqrt(atts.size);
-  if (
-    !(atts.modularity_class in state.clusters) &&
-    atts.x > -9112.981 &&
-    atts.x < -2971 &&
-    atts.y > -6557.1426 &&
-    atts.y < -3100
-  ) {
-    atts.modularity_class = 1;
-    atts.color = state.clusters[atts.modularity_class].color;
+  atts.size = atts.size / 10;
+  if (!Array.isArray(atts.author)) {
+    atts.author = atts.author.split(',').map((x) => x.trim().replace('  ', ' '));
   }
-  if (
-    !(atts.modularity_class in state.clusters) &&
-    atts.x > 6417.777 &&
-    atts.x < 10697.865 &&
-    atts.y > 3102.0493 &&
-    atts.y < 6008.047
-  ) {
-    atts.modularity_class = 2;
-    atts.color = state.clusters[atts.modularity_class].color;
+  if (!Array.isArray(atts.keywords)) {
+    atts.keywords = atts.keywords.split(',').map((x) => x.trim().replace('  ', ' '));
   }
-  if (atts.modularity_class in state.clusters)
-    state.clusters[atts.modularity_class].positions.push({ x: atts.x, y: atts.y });
+  // if (atts.size < 1) atts.size = Math.sqrt(atts.size);
+  // if (
+  //   !(atts.modularity_class in state.clusters) &&
+  //   atts.x > -9112.981 &&
+  //   atts.x < -2971 &&
+  //   atts.y > -6557.1426 &&
+  //   atts.y < -3100
+  // ) {
+  //   atts.modularity_class = 1;
+  //   atts.color = state.clusters[atts.modularity_class].color;
+  // }
+  // if (
+  //   !(atts.modularity_class in state.clusters) &&
+  //   atts.x > 6417.777 &&
+  //   atts.x < 10697.865 &&
+  //   atts.y > 3102.0493 &&
+  //   atts.y < 6008.047
+  // ) {
+  //   atts.modularity_class = 2;
+  //   atts.color = state.clusters[atts.modularity_class].color;
+  // }
+  // if (atts.modularity_class in state.clusters)
+  //   state.clusters[atts.modularity_class].positions.push({ x: atts.x, y: atts.y });
 });
 
 graph.forEachEdge((edge, _attributes, _source, _target, sourceAttributes) => {
   graph.setEdgeAttribute(edge, 'color', sourceAttributes.color);
 });
-
+// Label positions
 for (const key in state.clusters) {
   state.clusters[key].x =
     state.clusters[key].positions.reduce((acc, p) => acc + p.x, 0) / state.clusters[key].positions.length;
   state.clusters[key].y =
     state.clusters[key].positions.reduce((acc, p) => acc + p.y, 0) / state.clusters[key].positions.length;
 }
-const angle = Math.PI + Math.PI / 10;
-//this could be avoided by simply rotating the graph
-rotate_graph_n(graph, angle);
-rotate_labels(state, angle);
+// Rotate graph
+// const angle = Math.PI + Math.PI / 10;
+// //this could be avoided by simply rotating the graph
+// rotate_graph_n(graph, angle);
+// rotate_labels(state, angle);
 
 for (const key in state.clusters) {
   state.clusters[key].x += state.clusters[key].bias.x;
@@ -179,7 +186,8 @@ async function load_gexf() {
   loadingIndicator.style.margin = '10px';
   document.querySelector('.header').appendChild(loadingIndicator);
 
-  let res = await fetch('./all.gexf');
+  // let res = await fetch('./all.gexf');
+  let res = await fetch('./filtered.gexf');
   let to_parse = await res.text();
 
   // Hide loading indicator
@@ -696,6 +704,7 @@ function renderCard(nodeData) {
     <div class="close-button-card"></div>
     <div class="card-contents">
       <h3>${nodeData.label}</h3>
+      <h3>${nodeData.modularity_class}</h3>
       <p>Authors: ${nodeData.author.join(', ')}</p>
       <p>Abstract: ${abstract}</p>
       ${nodeData.keywords.length > 0 ? `<p>Keywords: ${nodeData.keywords}</p>` : ''}
