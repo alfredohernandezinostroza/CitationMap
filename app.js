@@ -161,6 +161,7 @@ try {
 } catch (error) {
   console.error('Error rendering gexf', error);
 }
+window.renderer = renderer;
 
 loadingAnimation.classList.remove('show');
 // fitViewportToNodes(renderer, graph.nodes(), { animate: true });
@@ -417,7 +418,7 @@ async function render_gexf(graph, state) {
     setHoveredNode(undefined);
   });
 
-  renderer.getCamera().setState({ x: 0.3507809854983921, y: 0.5799020634539014, angle: 0, ratio: 0.39972943598335855 });
+  renderer.getCamera().setState({ x: 0.42471387164646907, y: 0.3642796959806819, angle: 0, ratio: 0.539634738577534 });
   return renderer;
 }
 
