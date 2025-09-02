@@ -43,74 +43,60 @@ const state = {
   query_author: '',
   showLabels: true,
   clusters: {
-    5915: {
-      displaylabel: 'Motor\nCortex',
-      label: 'Motor Cortex',
+    2: {
+      displaylabel: 'Basic: Adaptation',
+      label: 'Basic: Adaptation',
       positions: [],
-      color: 'rgb(223, 137, 255)',
+      color: '#9A9CFF',
       bias: { x: 0, y: 0 },
     },
-    1334: {
-      displaylabel: 'Adaptation',
-      label: 'Adaptation',
+    7: {
+      displaylabel: 'Applied: Feedback and\ntraining scheduling',
+      label: 'Applied: Feedback and\ntraining scheduling',
       positions: [],
-      color: 'rgb(115, 192, 0)',
+      color: '#FF891B',
       bias: { x: 0, y: 0 },
     },
-    1125: {
-      displaylabel: 'Other Applied',
-      label: 'Other Applied',
+    12: {
+      displaylabel: 'Cognitive Approach',
+      label: 'Cognitive Approach',
       positions: [],
-      color: 'rgb(0, 196, 255)',
-      bias: { x: 3000, y: 300 },
-    },
-    624: {
-      displaylabel: 'Sequence\nLearning',
-      label: 'Sequence Learning',
-      positions: [],
-      color: 'rgb(76, 70, 62)',
+      color: '#FF6587',
       bias: { x: 0, y: 0 },
     },
-    584: {
-      displaylabel: 'Cerebellum',
-      label: 'Cerebellum',
+    15: {
+      displaylabel: 'Applied: Motivation\nand Attention',
+      label: 'Applied: Motivation\nand Attention',
       positions: [],
-      color: 'rgb(255, 136, 5)',
+      color: '#FC001C',
       bias: { x: 0, y: 0 },
     },
-    282: {
-      displaylabel: 'Feedback/\nRehabilitation',
-      label: 'Feedback/Rehabilitation',
+    11: {
+      displaylabel: 'Basic: Sequence Learning',
+      label: 'Basic: Sequence Learning',
       positions: [],
-      color: 'rgb(255, 85, 132)',
+      color: '#0018FF',
       bias: { x: 0, y: 0 },
     },
-    5738: {
-      displaylabel: 'Attention/Motivation',
-      label: 'Attention/Motivation',
+    6: {
+      displaylabel: 'Basic: Motor Cortex',
+      label: 'Basic: Motor Cortex',
       positions: [],
-      color: 'rgb(0, 189, 148)',
-      bias: { x: 200, y: -1000 },
+      color: '#54D3FF',
+      bias: { x: 0, y: 0 },
     },
-    840: {
-      displaylabel: 'Observational\nPractice',
-      label: 'Observational Practice',
+    5: {
+      displaylabel: 'Basic: Basal Ganglia',
+      label: 'Basic: Basal Ganglia',
       positions: [],
-      color: 'rgb(211, 179, 176)',
+      color: '#32AC7C',
       bias: { x: 0, y: 0 },
     },
     1: {
-      displaylabel: 'Cognitive approach',
-      label: 'Cognitive approach',
+      displaylabel: 'Basic: Cerebellum',
+      label: 'Basic: Cerebellum',
       positions: [],
-      color: 'rgb(209, 17, 0)',
-      bias: { x: 0, y: 0 },
-    },
-    2: {
-      displaylabel: 'Basal Ganglia',
-      label: 'Basal Ganglia',
-      positions: [],
-      color: 'rgb(165, 73, 241)',
+      color: '#00A50F',
       bias: { x: 0, y: 0 },
     },
   }, //objects like this: { [key: int]: Cluster }
@@ -145,8 +131,8 @@ graph.forEachNode((node, atts) => {
   //   atts.modularity_class = 2;
   //   atts.color = state.clusters[atts.modularity_class].color;
   // }
-  // if (atts.modularity_class in state.clusters)
-  //   state.clusters[atts.modularity_class].positions.push({ x: atts.x, y: atts.y });
+  if (atts.modularity_class in state.clusters)
+    state.clusters[atts.modularity_class].positions.push({ x: atts.x, y: atts.y });
 });
 
 graph.forEachEdge((edge, _attributes, _source, _target, sourceAttributes) => {
@@ -469,7 +455,7 @@ function bind_graph_interactions(renderer, state) {
   // Edge reducer with hover functionality
   renderer.setSetting('edgeReducer', function (edge, data) {
     const res = { ...data };
-    res.size = 0.09; // Base edge width
+    res.size = 0.11; // Base edge width
     if (
       state.hoveredNode &&
       !graph.extremities(edge).every((n) => n === state.hoveredNode || graph.areNeighbors(n, state.hoveredNode))
