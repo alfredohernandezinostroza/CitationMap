@@ -103,14 +103,14 @@ const state = {
 };
 
 graph.forEachNode((node, atts) => {
-  atts.size = atts.size / 10;
+  atts.size = atts.size / 8;
   if (!Array.isArray(atts.author)) {
     atts.author = atts.author.split(',').map((x) => x.trim().replace('  ', ' '));
   }
   if (!Array.isArray(atts.keywords)) {
     atts.keywords = atts.keywords.split(',').map((x) => x.trim().replace('  ', ' '));
   }
-  // if (atts.size < 1) atts.size = Math.sqrt(atts.size);
+  if (atts.size < 1) atts.size = Math.sqrt(atts.size);
   // if (
   //   !(atts.modularity_class in state.clusters) &&
   //   atts.x > -9112.981 &&
