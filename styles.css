@@ -104,7 +104,6 @@ body {
   font-weight: bold;
   color: #333;
   box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
-  position: absolute;
 }
 .tab-button.active {
   background-color: #ccc;
@@ -239,12 +238,45 @@ body {
 #selected-nodes-count {
   top: 10px;
   left: 10px;
-}
-#show-labels-checkbox-container {
-  bottom: 10px;
-  right: 10px;
+  position: absolute;
 }
 
+#bottom-left-controls {
+  position: absolute;
+  bottom: 10px;
+  right: 10px;
+  display: flex;
+  flex-direction: row;
+  gap: 10px;
+  z-index: 3;
+  justify-content: end;
+  width: 100%;
+  align-items: center;
+}
+
+#show-labels-checkbox-container {
+  /* bottom: 10px; */
+  /* right: 10px; */
+  /* flex: 1; */
+  /* width: 50px; */
+  /* height: 100px; */
+}
+#help-container {
+  /* flex: 1; */
+  /* width: 100px; */
+  /* height: 100px; */
+  /* bottom: 10px; */
+  /* right: 10px; */
+}
+
+.help-button {
+  border: none;
+  background-color: #fff;
+  cursor: pointer;
+  font-size: 16px;
+  font-weight: bold;
+  color: #333;
+}
 /* .cluster-labels-section label {
   margin-right: 20px;
 } */
