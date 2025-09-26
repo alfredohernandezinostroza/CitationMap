@@ -261,7 +261,7 @@ body {
   /* width: 50px; */
   /* height: 100px; */
 }
-#help-container {
+#help-button-container {
   /* flex: 1; */
   /* width: 100px; */
   /* height: 100px; */
@@ -269,7 +269,31 @@ body {
   /* right: 10px; */
 }
 
-.help-button {
+.help-container {
+  position: fixed;
+  bottom: 10%;
+  right: 1%;
+  /* left: 50%; */
+  /* transform: translate(-50%, 0%); */
+  z-index: 1000;
+}
+
+.help-contents {
+  border-radius: 25px;
+  border: 2px solid Black;
+  padding: 15px 15px 15px 15px;
+  margin: 20px 20px 20px 20px;
+  background: #ffffff;
+  overflow: visible;
+  /* box-shadow: 5px 5px 2px #888888; */
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
+  overflow-y: auto;
+  overflow-x: hidden;
+  width: 30vw;
+  height: 70vh;
+}
+
+#help-button {
   border: none;
   background-color: #fff;
   cursor: pointer;

@@ -404,6 +404,12 @@ async function render_gexf(graph, state) {
       skipIndexation: true,
     });
   });
+
+  const helpButton = document.getElementById('help-button');
+  helpButton.addEventListener('click', () => {
+    renderHelp();
+  });
+
   //Bind click behavior
   renderer.on('clickNode', ({ node }) => {
     const nodeData = graph.getNodeAttributes(node);
@@ -704,6 +710,20 @@ function renderCard(nodeData) {
   `;
   cardContainer.innerHTML = cardHTML;
   const buttonDiv = document.querySelector('.close-button-card');
+  buttonDiv.appendChild(closeButton);
+}
+function renderHelp() {
+  const helpContainer = document.querySelector('.help-container');
+
+  helpContainer.style.display = 'block';
+
+  const closeButton = document.createElement('button');
+  closeButton.textContent = '✖';
+  closeButton.classList.add('close-button');
+  closeButton.addEventListener('click', () => {
+    helpContainer.style.display = 'none';
+  });
+  const buttonDiv = document.querySelector('.close-button-help');
   buttonDiv.appendChild(closeButton);
 }
 
