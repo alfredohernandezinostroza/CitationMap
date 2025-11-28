@@ -372,42 +372,47 @@ async function render_gexf(graph, state) {
 
   add_labels(renderer, state, sigma_container);
 
-  // Bind search input interactions:
-  search_input_label.addEventListener('input', () => {
-    setSearchQuery2(state, graph, renderer, search_inputs);
-  });
-  search_input_author.addEventListener('input', () => {
-    setSearchQuery2(state, graph, renderer, search_inputs);
-  });
-  search_input_abstract.addEventListener('input', () => {
-    setSearchQuery2(state, graph, renderer, search_inputs);
-  });
-  search_input_journal.addEventListener('input', () => {
-    setSearchQuery2(state, graph, renderer, search_inputs);
-  });
-  search_input_keywords.addEventListener('input', () => {
+  // Replace live filtering with an explicit Filter button to improve performance.
+  const applyFilterButton = document.createElement('button');
+  applyFilterButton.id = 'apply-filters-button';
+  applyFilterButton.textContent = 'Filter';
+  applyFilterButton.className = 'rounded-div';
+  const globalFiltersEl = document.getElementById('global-filters') || search_container;
+  globalFiltersEl.prepend(applyFilterButton);
+
+  applyFilterButton.addEventListener('click', () => {
     setSearchQuery2(state, graph, renderer, search_inputs);
   });
 
-  if (search_input_mesh) {
-    search_input_mesh.addEventListener('input', () => {
-      setSearchQuery2(state, graph, renderer, search_inputs);
+  // Run filtering when user presses Enter in any search input (not range sliders)
+  [search_input_label, search_input_author, search_input_abstract, search_input_journal, search_input_keywords, search_input_mesh].forEach((input) => {
+    if (input) {
+      input.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter') {
+          e.preventDefault();
+          setSearchQuery2(state, graph, renderer, search_inputs);
+        }
+      });
+    }
+  });
+
+  // Update year labels live on slider change (without running full filter)
+  if (minYearThresholdRange) {
+    minYearThresholdRange.addEventListener('input', () => {
+      document.getElementById('label-min-threshold').innerHTML = `Min year: ${minYearThresholdRange.value}`;
     });
   }
-
-  // Bind labels threshold to range input
-  minYearThresholdRange.addEventListener('input', () => {
-    setSearchQuery2(state, graph, renderer, search_inputs);
-  });
-  maxYearThresholdRange.addEventListener('input', () => {
-    setSearchQuery2(state, graph, renderer, search_inputs);
-  });
+  if (maxYearThresholdRange) {
+    maxYearThresholdRange.addEventListener('input', () => {
+      document.getElementById('label-max-threshold').innerHTML = `Max year: ${maxYearThresholdRange.value}`;
+    });
+  }
 
   const checkboxes = Array.from(document.querySelectorAll('input[type="checkbox"][id^="cluster"]'));
   checkboxes.forEach((checkbox) =>
     checkbox.addEventListener('change', () => {
-      setSearchQuery2(state, graph, renderer, search_inputs);
-      // if (state.suggestions) fitViewportToNodes(renderer, Array.from(state.suggestions), { animate: true });
+      // inexpensive UI refresh only; full filtering runs when user clicks 'Filter' or presses Enter
+      renderer.refresh({ skipIndexation: true });
     }),
   );
 
@@ -676,6 +681,10 @@ function setSearchQuery2(state, graph, renderer, search_inputs, checkboxes) {
 
   const checkedCheckboxes = Array.from(document.querySelectorAll('input[type="checkbox"][id^="cluster"]:checked'));
   const checked_mod_classes = checkedCheckboxes.map((v) => v.id.split('-')[1]);
+  
+  // Update visible clusters for label display (only when Filter is clicked)
+  state.visibleClusters = new Set(checked_mod_classes);
+  
   let nodes_in_checked_classes = graph
     .nodes()
     .map((n) => ({ id: n, mod_class: graph.getNodeAttribute(n, 'modularity_class') }))
@@ -804,10 +813,11 @@ function add_labels(renderer, state, sigma_container) {
   // insert the layer underneath the hovers layer
   sigma_container.insertBefore(clustersLayer, sigma_container.querySelector('.sigma-hovers'));
 
+  // Store the current checked cluster classes in state
+  state.visibleClusters = new Set(Object.keys(state.clusters));
+
   // Clusters labels position needs to be updated on each render
   renderer.on('afterRender', () => {
-    const checkedCheckboxes = Array.from(document.querySelectorAll('input[type="checkbox"][id^="cluster"]:checked'));
-    const checked_mod_classes = checkedCheckboxes.map((v) => v.id.split('-')[1]);
     for (const key in state.clusters) {
       const cluster = state.clusters[key];
       const clusterLabel = document.getElementById(cluster.label);
@@ -818,15 +828,16 @@ function add_labels(renderer, state, sigma_container) {
         clusterLabel.style.left = `${viewportPos.x}px`;
         clusterLabel.style.fontSize = `${0.7 / Math.sqrt(renderer.getCamera().ratio)}rem`;
       }
-      if (!checked_mod_classes.includes(key) || !state.showLabels) {
-        clusterLabel.style.display = 'none';
+      // Only hide/show based on state.visibleClusters (updated by Filter button), not checkbox state
+      if (!state.visibleClusters.has(key) || !state.showLabels) {
+        if (clusterLabel) clusterLabel.style.display = 'none';
       } else {
-        clusterLabel.style.display = 'block';
+        if (clusterLabel) clusterLabel.style.display = 'block';
       }
       if (state.hoveredNode) {
-        clusterLabel.style.opacity = 0.5;
+        if (clusterLabel) clusterLabel.style.opacity = 0.5;
       } else {
-        clusterLabel.style.opacity = 1;
+        if (clusterLabel) clusterLabel.style.opacity = 1;
       }
     }
   });
