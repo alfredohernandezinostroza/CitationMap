@@ -104,11 +104,18 @@ const state = {
 
 graph.forEachNode((node, atts) => {
   atts.size = atts.size / 8;
+  // if these atts are not liststrings in the graph, they need to be converted to:
   if (!Array.isArray(atts.author)) {
     atts.author = atts.author.split(',').map((x) => x.trim().replace('  ', ' '));
   }
   if (!Array.isArray(atts.keywords)) {
     atts.keywords = atts.keywords.split(',').map((x) => x.trim().replace('  ', ' '));
+  }
+  if (!Array.isArray(atts.mesh)) {
+    atts.mesh = atts.mesh.split(',').map((x) => x.trim().replace('  ', ' '));
+  }
+  if (!Array.isArray(atts.mesh_id)) {
+    atts.mesh_id = atts.mesh_id.split(',').map((x) => x.trim().replace('  ', ' '));
   }
   if (atts.size < 1) atts.size = Math.sqrt(atts.size);
   // if (
@@ -173,8 +180,10 @@ async function load_gexf() {
   loadingIndicator.style.margin = '10px';
   document.querySelector('.header').appendChild(loadingIndicator);
 
-  // let res = await fetch('./all.gexf');
-  let res = await fetch('./filtered.gexf');
+  // let res = await fetch('./filtered.gexf');
+  // let res = await fetch('./filtered_with_mesh.gexf');
+  let res = await fetch('./filtered_with_transferred_mesh.gexf');
+  // let res = await fetch('./node_attributes_with_mesh.gexf');
   let to_parse = await res.text();
 
   // Hide loading indicator
@@ -211,6 +220,12 @@ function clean_graph(graph) {
     }
     if (!graph.hasNodeAttribute(node, 'keywords')) {
       graph.setNodeAttribute(node, 'keywords', []);
+    }
+    if (!graph.hasNodeAttribute(node, 'mesh')) {
+      graph.setNodeAttribute(node, 'mesh', []);
+    }
+    if (!graph.hasNodeAttribute(node, 'mesh_id')) {
+      graph.setNodeAttribute(node, 'mesh_id', []);
     }
     if (!graph.hasNodeAttribute(node, 'citationcount')) {
       graph.setNodeAttribute(node, 'citationcount', parseInt(graph.getNodeAttribute(node, 'citationcount')));
@@ -298,6 +313,15 @@ async function render_gexf(graph, state) {
     .map((node) => `<option value="${graph.getNodeAttribute(node, 'keywords')}"></option>`)
     .join('\n');
 
+  const search_input_mesh = document.getElementById('search-input-mesh');
+  const search_suggestions_mesh = document.getElementById('suggestions-mesh');
+  if (search_input_mesh) {
+    search_suggestions_mesh.innerHTML = graph
+      .nodes()
+      .map((node) => `<option value="${graph.getNodeAttribute(node, 'mesh')}"></option>`)
+      .join('\n');
+  }
+
   search_suggestions_journal.innerHTML = graph
     .nodes()
     .map((node) => `<option value="${graph.getNodeAttribute(node, 'journal')}"></option>`)
@@ -364,6 +388,12 @@ async function render_gexf(graph, state) {
   search_input_keywords.addEventListener('input', () => {
     setSearchQuery2(state, graph, renderer, search_inputs);
   });
+
+  if (search_input_mesh) {
+    search_input_mesh.addEventListener('input', () => {
+      setSearchQuery2(state, graph, renderer, search_inputs);
+    });
+  }
 
   // Bind labels threshold to range input
   minYearThresholdRange.addEventListener('input', () => {
@@ -562,13 +592,15 @@ function setSearchQuery2(state, graph, renderer, search_inputs, checkboxes) {
   const query_abstract = search_inputs[2].value;
   const query_journal = search_inputs[3].value;
   const query_keywords = search_inputs[4].value;
-  const min_year_value = +search_inputs[5].value; //convert to int
-  const max_year_value = +search_inputs[6].value; //convert to int
+  const query_mesh = search_inputs[5].value;
+  const min_year_value = +search_inputs[6].value; //convert to int
+  const max_year_value = +search_inputs[7].value; //convert to int
   let suggestions_label = undefined;
   let suggestions_author = undefined;
   let suggestions_abstract = undefined;
   let suggestions_journal = undefined;
   let suggestions_keywords = undefined;
+  let suggestions_mesh = undefined;
   state.query_label = query_label;
   state.query_author = query_author;
   state.query_abstract = query_abstract;
@@ -622,6 +654,18 @@ function setSearchQuery2(state, graph, renderer, search_inputs, checkboxes) {
       suggestions_keywords = suggestions_keywords.union(new Set(suggestions.map(({ id }) => id)));
     });
   }
+  if (query_mesh !== '') {
+    const queries = query_mesh.split(',');
+    suggestions_mesh = new Set();
+    queries.forEach((query) => {
+      const lcQuery = query.toLowerCase();
+      let suggestions = graph
+        .nodes()
+        .map((n) => ({ id: n, array_prop: graph.getNodeAttribute(n, 'mesh') }))
+        .filter(({ array_prop }) => array_prop?.some((v) => v.toLowerCase().includes(lcQuery)) ?? false);
+      suggestions_mesh = suggestions_mesh.union(new Set(suggestions.map(({ id }) => id)));
+    });
+  }
 
   let year_nodes = graph
     .nodes()
@@ -648,6 +692,7 @@ function setSearchQuery2(state, graph, renderer, search_inputs, checkboxes) {
     suggestions_abstract,
     suggestions_journal,
     suggestions_keywords,
+    suggestions_mesh,
     year_nodes,
     nodes_in_checked_classes,
   ].filter(Boolean);
@@ -656,8 +701,8 @@ function setSearchQuery2(state, graph, renderer, search_inputs, checkboxes) {
     definedSuggestions[0],
   );
 
-  document.getElementById('label-min-threshold').innerHTML = `Min year: ${search_inputs[5].value}`;
-  document.getElementById('label-max-threshold').innerHTML = `Max year: ${search_inputs[6].value}`;
+  document.getElementById('label-min-threshold').innerHTML = `Min year: ${search_inputs[6].value}`;
+  document.getElementById('label-max-threshold').innerHTML = `Max year: ${search_inputs[7].value}`;
 
   const selectedNodesCountText = document.getElementById('selected-nodes-count-text');
   if (state.suggestions) selectedNodesCountText.textContent = `Nodes selected: ${state.suggestions.size}`;
@@ -701,6 +746,8 @@ function renderCard(nodeData) {
       <p>Authors: ${nodeData.author.join(', ')}</p>
       <p>Abstract: ${abstract}</p>
       ${nodeData.keywords.length > 0 ? `<p>Keywords: ${nodeData.keywords}</p>` : ''}
+      ${nodeData.mesh.length > 0 ? `<p>MeSH Headers: ${nodeData.mesh.join(', ')}</p>` : ''}
+      ${nodeData.mesh_id.length > 0 ? `<p>MeSH IDs: ${nodeData.mesh_id.join(', ')}</p>` : ''}
       <p>Year: ${nodeData.date}</p>
       <p>Journal: ${nodeData.journal}</p>
       <p>Citations: ${nodeData.citationcount}</p>
