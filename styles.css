@@ -105,6 +105,24 @@ body {
   color: #333;
   box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
 }
+
+#apply-filters-button {
+  width: 90%;
+  padding: 12px 20px;
+  margin: 10px auto;
+  background-color: #2374FF;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  font-size: 16px;
+  font-weight: bold;
+  cursor: pointer;
+  transition: background-color 0.2s ease-in-out;
+}
+
+#apply-filters-button:hover {
+  background-color: #1d5fd1;
+}
 .tab-button.active {
   background-color: #ccc;
 }
@@ -252,6 +270,7 @@ body {
   justify-content: end;
   width: 100%;
   align-items: center;
+  pointer-events: none;
 }
 
 #show-labels-checkbox-container {
@@ -307,6 +326,11 @@ body {
 #year-min-threshold,
 #year-max-threshold {
   width: 98%;
+  pointer-events: auto;
+}
+
+#year-max-threshold {
+  z-index: 5;
 }
 .loading-animation {
   position: fixed;
