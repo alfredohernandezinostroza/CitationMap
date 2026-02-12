@@ -180,10 +180,8 @@ async function load_gexf() {
   loadingIndicator.style.margin = '10px';
   document.querySelector('.header').appendChild(loadingIndicator);
 
-  // let res = await fetch('./filtered.gexf');
-  // let res = await fetch('./filtered_with_mesh.gexf');
-  let res = await fetch('./filtered_with_transferred_mesh.gexf');
-  // let res = await fetch('./node_attributes_with_mesh.gexf');
+  // let res = await fetch('./filtered_with_transferred_mesh.gexf');
+  let res = await fetch('./test.gexf');
   let to_parse = await res.text();
 
   // Hide loading indicator
@@ -370,15 +368,18 @@ async function render_gexf(graph, state) {
     allowInvalidContainer: true,
   });
 
-  add_labels(renderer, state, sigma_container);
 
   // Replace live filtering with an explicit Filter button to improve performance.
+  const applyFilterButtonContainer = document.createElement('div');
+  applyFilterButtonContainer.class = 'filter-button-container';
   const applyFilterButton = document.createElement('button');
   applyFilterButton.id = 'apply-filters-button';
   applyFilterButton.textContent = 'Filter';
   applyFilterButton.className = 'rounded-div';
-  const globalFiltersEl = document.getElementById('global-filters') || search_container;
-  globalFiltersEl.prepend(applyFilterButton);
+  applyFilterButtonContainer.prepend(applyFilterButton)
+  const globalFiltersEl = document.getElementById('filter-button-container') || search_container;
+  globalFiltersEl.prepend(applyFilterButtonContainer);
+  add_labels(renderer, state, sigma_container);
 
   applyFilterButton.addEventListener('click', () => {
     setSearchQuery2(state, graph, renderer, search_inputs);

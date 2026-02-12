@@ -108,7 +108,7 @@ body {
 
 #apply-filters-button {
   width: 90%;
-  height: clamp(40px, 6vh, 80px);
+  /* height: clamp(40px, 6vh, 80px); */
   padding: 12px 20px;
   margin: 10px auto;
   background-color: #2374FF;

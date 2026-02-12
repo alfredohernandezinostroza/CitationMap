@@ -1,0 +1,170 @@
+<?xml version='1.0' encoding='utf-8'?>
+<gexf xmlns:viz="http://www.gexf.net/1.2draft/viz" xmlns="http://www.gexf.net/1.2draft" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.gexf.net/1.2draft http://www.gexf.net/1.2draft/gexf.xsd" version="1.2">
+  <meta lastmodifieddate="2025-11-28">
+    <creator>NetworkX 3.6</creator>
+  </meta>
+  <graph defaultedgetype="directed" mode="static" name="">
+    <attributes mode="static" class="node">
+      <attribute id="author" title="author" type="string" />
+      <attribute id="abstract" title="abstract" type="string" />
+      <attribute id="journal" title="journal" type="string" />
+      <attribute id="database" title="database" type="string" />
+      <attribute id="doi" title="doi" type="string" />
+      <attribute id="date" title="date" type="string" />
+      <attribute id="citationcount" title="citationcount" type="long" />
+      <attribute id="indegree" title="indegree" type="long">
+        <default>0</default>
+      </attribute>
+      <attribute id="outdegree" title="outdegree" type="long">
+        <default>0</default>
+      </attribute>
+      <attribute id="degree" title="degree" type="long">
+        <default>0</default>
+      </attribute>
+      <attribute id="componentnumber" title="componentnumber" type="long">
+        <default>0</default>
+      </attribute>
+      <attribute id="strongcompnum" title="strongcompnum" type="long">
+        <default>0</default>
+      </attribute>
+      <attribute id="modularity_class" title="modularity_class" type="long">
+        <default>0</default>
+      </attribute>
+      <attribute id="mesh" title="mesh" type="string" />
+      <attribute id="mesh_id" title="mesh_id" type="string" />
+      <attribute id="keywords" title="keywords" type="string" />
+    </attributes>
+    <nodes>
+      <node id="1" label="A perturbation-based balance training program for older adults: study protocol for a randomised controlled trial.">
+        <viz:color r="255" g="137" b="27" a="1.0" />
+        <viz:size value="3.1323004" />
+        <viz:position x="792.71796" y="835.0634" z="0.0" />
+        <attvalues>
+          <attvalue for="author" value="Avril A. Mansfield, Amy L AL. Peters, Barbara A BA. Liu, Brian E BE. Maki" />
+          <attvalue for="abstract" value="Previous research investigating exercise as a means of falls prevention in older adults has shown mixed results. Lack of specificity of the intervention may be an important factor contributing to negative results. Change-in-support (CIS) balance reactions, which involve very rapid stepping or grasping movements of the limbs, play a critical role in preventing falls; hence, a training program that improves ability to execute effective CIS reactions could potentially have a profound effect in reducing risk of falling. This paper describes: 1) the development of a perturbation-based balance training program that targets specific previously-reported age-related impairments in CIS reactions, and 2) a study protocol to evaluate the efficacy of this new training program." />
+          <attvalue for="journal" value="BMC geriatrics" />
+          <attvalue for="database" value="Pubmed" />
+          <attvalue for="doi" value="10.1186/1471-2318-7-12" />
+          <attvalue for="date" value="2007-06-02 00:00:00" />
+          <attvalue for="citationcount" value="3" />
+          <attvalue for="indegree" value="3" />
+          <attvalue for="outdegree" value="2" />
+          <attvalue for="degree" value="5" />
+          <attvalue for="componentnumber" value="0" />
+          <attvalue for="strongcompnum" value="297" />
+          <attvalue for="modularity_class" value="7" />
+          <attvalue for="mesh" value="Accidental Falls, Age Factors, Aged, Aged, 80 and over, Exercise Therapy, Female, Gait, Geriatric Assessment, Humans, Male, Postural Balance, Posture, Prognosis, Reference Values, Risk Factors, Sex Factors, Single-Blind Method, Treatment Outcome, Walking" />
+          <attvalue for="mesh_id" value="D000058, D000367, D000368, D000369, D005081, D005260, D005684, D015577, D006801, D008297, D004856, D011187, D011379, D012016, D012307, D012737, D016037, D016896, D016138" />
+        </attvalues>
+      </node>
+      <node id="3" label="Observational practice benefits are limited to perceptual improvements in the acquisition of a novel coordination skill.">
+        <viz:color r="255" g="137" b="27" a="1.0" />
+        <viz:size value="3.705602" />
+        <viz:position x="1565.0255" y="15.308681" z="0.0" />
+        <attvalues>
+          <attvalue for="author" value="Dana Maslovat,Nicola J.  Hodges,Olav E.  Krigolson,Todd C.  Handy" />
+          <attvalue for="abstract" value="There is disagreement about the effectiveness of observational practice for the acquisition of novel coordination skills and the type of processes involved in observation of novel movements. In this study, we examined learning of a bimanual 90° phase offset through comparisons of three groups; physical practice, observational practice and no practice ( n = 12/group). Groups were compared before and after practice on perception and production scans of the practised pattern. The observation group was yoked to the physical group such that observers watched repeated demonstrations of a learning model. Although there were no positive effects of observational practice for physical performance measures, the observation group did not differ from the physical practice group and was more accurate than controls on perceptual discrimination measures after practice. We concluded that observation of a novel bimanual movement can aid perception but that physical practice is necessary for immediate physical performance benefits. These results are discussed in terms of cognitive mediation models of motor skill learning. [ABSTRACT FROM AUTHOR]" />
+          <attvalue for="keywords" value="MOTOR ability, MATHEMATICAL models, MOTOR learning, NONVERBAL ability, MECHANICAL ability, Bimanual coordination, Modeling, Motor learning, Visual perception" />
+          <attvalue for="journal" value="Experimental Brain Research" />
+          <attvalue for="database" value="EBSCO" />
+          <attvalue for="doi" value="10.1007/s00221-010-2302-7" />
+          <attvalue for="date" value="2010/07//" />
+          <attvalue for="citationcount" value="16" />
+          <attvalue for="indegree" value="16" />
+          <attvalue for="outdegree" value="22" />
+          <attvalue for="degree" value="38" />
+          <attvalue for="componentnumber" value="0" />
+          <attvalue for="strongcompnum" value="2078" />
+          <attvalue for="modularity_class" value="7" />
+          <attvalue for="mesh" value="Cognition, Discrimination, Psychological, Feedback, Psychological, Female, Hand, Humans, Learning, Male, Models, Psychological, Motion Perception, Motor Skills, Practice, Psychological, Time Factors, Video Recording, Visual Perception, Young Adult" />
+          <attvalue for="mesh_id" value="D003071, D004192, D030141, D005260, D006225, D006801, D007858, D008297, D008960, D009039, D009048, D011214, D013997, D014741, D014796, D055815" />
+        </attvalues>
+      </node>
+      <node id="5" label="Saccadic Adaptation in 10-41 Month-Old Children.">
+        <viz:color r="0" g="165" b="15" a="1.0" />
+        <viz:size value="3.0441" />
+        <viz:position x="-2489.1016" y="1393.5613" z="0.0" />
+        <attvalues>
+          <attvalue for="author" value="Christelle C. Lemoine-Lardennois, Nadia N. Alahyane, Coline C. Tailhefer, Thérèse T. Collins, Jacqueline J. Fagard, Karine K. Doré-Mazars" />
+          <attvalue for="abstract" value="When saccade amplitude becomes systematically inaccurate, adaptation mechanisms gradually decrease or increase it until accurate saccade targeting is recovered. Adaptive shortening and adaptive lengthening of saccade amplitude rely on separate mechanisms in adults. When these adaptation mechanisms emerge during development is poorly known except that adaptive shortening processes are functional in children above 8 years of age. Yet, saccades in infants are consistently inaccurate (hypometric) as if adaptation mechanisms were not fully functional in early childhood. Here, we tested reactive saccade adaptation in 10-41 month-old children compared to a group of 20-30 year-old adults. A visual target representing a cartoon character appeared at successive and unpredictable locations 10° apart on a computer screen. During the eye movement toward the target, it systematically stepped in the direction opposite to the saccade to induce an adaptive shortening of saccade amplitude (Experiment 1). In Experiment 2, the target stepped in the same direction as the ongoing saccade to induce an adaptive lengthening of saccade amplitude. In both backward and forward adaptation experiments, saccade adaptation was compared to a control condition where there was no intrasaccadic target step. Analysis of baseline performance revealed both longer saccade reaction times and hypometric saccades in children compared to adults. In both experiments, children on average showed gradual changes in saccade amplitude consistent with the systematic intrasaccadic target steps. Moreover, the amount of amplitude change was similar between children and adults for both backward and forward adaptation. Finally, adaptation abilities in our child group were not related to age. Overall the results suggest that the neural mechanisms underlying reactive saccade adaptation are in place early during development." />
+          <attvalue for="journal" value="Frontiers in human neuroscience" />
+          <attvalue for="database" value="Pubmed" />
+          <attvalue for="doi" value="10.3389/fnhum.2016.00241" />
+          <attvalue for="date" value="2016-06-03 00:00:00" />
+          <attvalue for="citationcount" value="1" />
+          <attvalue for="indegree" value="1" />
+          <attvalue for="outdegree" value="18" />
+          <attvalue for="degree" value="19" />
+          <attvalue for="componentnumber" value="0" />
+          <attvalue for="strongcompnum" value="2172" />
+          <attvalue for="modularity_class" value="1" />
+        </attvalues>
+      </node>
+      <node id="8" label="Older and younger adults differ in time course of skill acquisition but not in overall improvement in a bimanual visuomotor tracking task.">
+        <viz:color r="0" g="24" b="255" a="1.0" />
+        <viz:size value="3.0" />
+        <viz:position x="-50.05539" y="-176.34915" z="0.0" />
+        <attvalues>
+          <attvalue for="author" value="Ana A. Zvornik, Keenie Ayla KA. Andersen, Andreas Deigaard AD. Petersen, Mikael M. Novén, Hartwig Roman HR. Siebner, Jesper J. Lundbye-Jensen, Anke Ninija AN. Karabanov" />
+          <attvalue for="abstract" value="Manual motor performance declines with age, but the extent to which age influences the acquisition of new skills remains a topic of debate. Here, we examined whether older healthy adults show less training-dependent performance improvements during a single session of a bimanual pinch task than younger adults. We also explored whether physical and cognitive factors, such as grip strength or motor-cognitive ability, are associated with performance improvements. Healthy younger (n = 16) and older (n = 20) adults performed three training blocks separated by short breaks. Participants were tasked with producing visually instructed changes in pinch force using their right and left thumb and index fingers. Task complexity was varied by shifting between bimanual mirror-symmetric and inverse-asymmetric changes in pinch force. Older adults generally displayed higher visuomotor force tracking errors during the more complex inverse-asymmetric task compared to younger adults. Both groups showed a comparable net decrease in visuomotor force tracking error over the entire session, but their improvement trajectories differed. Young adults showed enhanced visuomotor tracking error only in the first block, while older adults exhibited a more gradual improvement over the three training blocks. Furthermore, grip strength and performance on a motor-cognitive test battery scaled positively with individual performance improvements during the first block in both age groups. Together, the results show subtle age-dependent differences in the rate of bimanual visuomotor skill acquisition, while overall short-term learning ability is maintained." />
+          <attvalue for="journal" value="Frontiers in aging neuroscience" />
+          <attvalue for="database" value="Pubmed" />
+          <attvalue for="doi" value="10.3389/fnagi.2024.1373252" />
+          <attvalue for="date" value="2024-04-26 00:00:00" />
+          <attvalue for="citationcount" value="0" />
+          <attvalue for="indegree" value="0" />
+          <attvalue for="outdegree" value="16" />
+          <attvalue for="degree" value="16" />
+          <attvalue for="componentnumber" value="0" />
+          <attvalue for="strongcompnum" value="4447" />
+          <attvalue for="modularity_class" value="11" />
+        </attvalues>
+      </node>
+      <node id="9" label="Transcranial Magnetic Stimulation as a Tool to Investigate Motor Cortex Excitability in Sport.">
+        <viz:color r="0" g="196" b="255" a="1.0" />
+        <viz:size value="3.0882003" />
+        <viz:position x="-557.4527" y="-1449.7769" z="0.0" />
+        <attvalues>
+          <attvalue for="author" value="Fiorenzo Moscatelli,Antonietta  Messina,Anna  Valenzano,Vincenzo  Monda,Monica  Salerno,Francesco  Sessa,Ester  La Torre,Domenico  Tafuri,Alessia  Scarinci,Michela  Perrella,Gabriella  Marsala,Marcellino  Monda,Giuseppe  Cibelli,Chiara  Porro,Giovanni  Messina" />
+          <attvalue for="abstract" value="Transcranial magnetic stimulation, since its introduction in 1985, has brought important innovations to the study of cortical excitability as it is a non-invasive method and, therefore, can be used both in healthy and sick subjects. Since the introduction of this cortical stimulation technique, it has been possible to deepen the neurophysiological aspects of motor activation and control. In this narrative review, we want to provide a brief overview regarding TMS as a tool to investigate changes in cortex excitability in athletes and highlight how this tool can be used to investigate the acute and chronic responses of the motor cortex in sport science. The parameters that could be used for the evaluation of cortical excitability and the relative relationship with motor coordination and muscle fatigue, will be also analyzed. Repetitive physical training is generally considered as a principal strategy for acquiring a motor skill, and this process can elicit cortical motor representational changes referred to as use-dependent plasticity. In training settings, physical practice combined with the observation of target movements can enhance cortical excitability and facilitate the process of learning. The data to date suggest that TMS is a valid technique to investigate the changes in motor cortex excitability in trained and untrained subjects. Recently, interest in the possible ergogenic effect of non-invasive brain stimulation in sport is growing and therefore in the future it could be useful to conduct new experiments to evaluate the impact on learning and motor performance of these techniques. [ABSTRACT FROM AUTHOR]" />
+          <attvalue for="keywords" value="TRANSCRANIAL magnetic stimulation, MOTOR cortex, BRAIN stimulation, MOTOR ability, MOTOR learning, corticalexcitability, motor cortex, TMS, transcranial magnetic stimulation" />
+          <attvalue for="journal" value="Brain Sciences (2076-3425)" />
+          <attvalue for="database" value="EBSCO" />
+          <attvalue for="doi" value="10.3390/brainsci11040432" />
+          <attvalue for="date" value="2021/04//" />
+          <attvalue for="citationcount" value="2" />
+          <attvalue for="indegree" value="2" />
+          <attvalue for="outdegree" value="10" />
+          <attvalue for="degree" value="12" />
+          <attvalue for="componentnumber" value="0" />
+          <attvalue for="strongcompnum" value="4458" />
+          <attvalue for="modularity_class" value="6" />
+        </attvalues>
+      </node>
+      <node id="10" label="Properties of intermodal transfer after dual visuo- and auditory-motor adaptation.">
+        <viz:color r="154" g="156" b="255" a="1.0" />
+        <viz:size value="3.2646008" />
+        <viz:position x="-574.3129" y="1287.747" z="0.0" />
+        <attvalues>
+          <attvalue for="author" value="Gerd Schmitz,Otmar L.  Bock" />
+          <attvalue for="abstract" value="Previous work documented that sensorimotor adaptation transfers between sensory modalities: When subjects adapt with one arm to a visuomotor distortion while responding to visual targets, they also appear to be adapted when they are subsequently tested with auditory targets. Vice versa, when they adapt to an auditory-motor distortion while pointing to auditory targets, they appear to be adapted when they are subsequently tested with visual targets. Therefore, it was concluded that visuomotor as well as auditory-motor adaptation use the same adaptation mechanism. Furthermore, it has been proposed that sensory information from the trained modality is weighted larger than sensory information from an untrained one, because transfer between sensory modalities is incomplete. The present study tested these hypotheses for dual arm adaptation. One arm adapted to an auditory-motor distortion and the other either to an opposite directed auditory-motor or visuomotor distortion. We found that both arms adapted significantly. However, compared to reference data on single arm adaptation, adaptation in the dominant arm was reduced indicating interference from the non-dominant to the dominant arm. We further found that arm-specific aftereffects of adaptation, which reflect recalibration of sensorimotor transformation rules, were stronger or equally strong when targets were presented in the previously adapted compared to the non-adapted sensory modality, even when one arm adapted visually and the other auditorily. The findings are discussed with respect to a recently published schematic model on sensorimotor adaptation. [ABSTRACT FROM AUTHOR]" />
+          <attvalue for="keywords" value="SENSORIMOTOR cortex, VISUOMOTOR coordination, HYPOTHESIS, ADAPTABILITY (Personality), INFORMATION theory, ARM physiology, PHYSIOLOGICAL adaptation, AUDITORY perception, PSYCHOLOGY of movement, TRANSFER of training, VISUAL perception, ACOUSTIC stimulation, Interference, Intermanual transfer, Intermodal transfer, Motor learning, Sensorimotor adaptation" />
+          <attvalue for="journal" value="Human Movement Science" />
+          <attvalue for="database" value="EBSCO" />
+          <attvalue for="doi" value="10.1016/j.humov.2017.08.006" />
+          <attvalue for="date" value="2017/10//" />
+          <attvalue for="citationcount" value="6" />
+          <attvalue for="indegree" value="6" />
+          <attvalue for="outdegree" value="23" />
+          <attvalue for="degree" value="29" />
+          <attvalue for="componentnumber" value="0" />
+          <attvalue for="strongcompnum" value="4464" />
+          <attvalue for="modularity_class" value="2" />
+          <attvalue for="mesh" value="Acoustic Stimulation, Adaptation, Physiological, Adult, Arm, Auditory Perception, Female, Humans, Male, Photic Stimulation, Psychomotor Performance, Transfer, Psychology, Visual Perception, Young Adult" />
+          <attvalue for="mesh_id" value="D000161, D000222, D000328, D001132, D001307, D005260, D006801, D008297, D010775, D011597, D014163, D014796, D055815" />
+        </attvalues>
+      </node>
+      </nodes>
+      <edges>   </edges>
+  </graph>
+</gexf>
