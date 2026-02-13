@@ -48,7 +48,8 @@ const state = {
       label: 'Basic: Adaptation',
       positions: [],
       color: '#9A9CFF',
-      bias: { x: 0, y: 0 },
+      label_bias: { x: 0, y: 0 },
+      keywords_bias: { x: -60, y: -130 },
       top_keywords:{
         "Motor  Learning": 1083,
         "Motor Ability": 326,
@@ -77,7 +78,8 @@ const state = {
       label: 'Applied: Feedback and\ntraining scheduling',
       positions: [],
       color: '#FF891B',
-      bias: { x: 0, y: 0 },
+      label_bias: { x: 0, y: 0 },
+      keywords_bias: { x: -10, y: -170 },
       top_keywords:{
         "Motor  Learning": 708,
         "Motor Ability": 338,
@@ -106,7 +108,8 @@ const state = {
       label: 'Ecological Dynamics',
       positions: [],
       color: '#FF6587',
-      bias: { x: 0, y: 0 },
+      label_bias: { x: 0, y: 0 },
+      keywords_bias: { x: 40, y: -150 },
       top_keywords: {
         "Motor  Learning": 156,
         "Skill Acquisition": 124,
@@ -135,7 +138,8 @@ const state = {
       label: 'Applied: Motivation\nand Attention',
       positions: [],
       color: '#FC001C',
-      bias: { x: 0, y: 0 },
+      label_bias: { x: 0, y: 0 },
+      keywords_bias: { x: 80, y: 50 },
       top_keywords: {
         "Motor  Learning": 423,
         "Motor Ability": 210,
@@ -164,7 +168,8 @@ const state = {
       label: 'Basic: Sequence Learning',
       positions: [],
       color: '#0018FF',
-      bias: { x: 0, y: 0 },
+      label_bias: { x: 0, y: 0 },
+      keywords_bias: { x: 20, y: 170 },
       top_keywords:{
         "Motor  Learning": 779,
         "Motor Ability": 294,
@@ -193,7 +198,8 @@ const state = {
       label: 'Basic: Motor Cortex',
       positions: [],
       color: '#54D3FF',
-      bias: { x: 0, y: 0 },
+      label_bias: { x: 0, y: 0 },
+      keywords_bias: { x: -30, y: 150 },
       top_keywords: {
         "Motor  Learning": 754,
         "Motor Cortex": 426,
@@ -222,7 +228,8 @@ const state = {
       label: 'Basic: Basal Ganglia',
       positions: [],
       color: '#32AC7C',
-      bias: { x: 0, y: 0 },
+      label_bias: { x: 0, y: 0 },
+      keywords_bias: { x: -40, y: 90 },
       top_keywords: {
         "Motor  Learning": 53,
         "Basal Ganglia": 44,
@@ -251,7 +258,8 @@ const state = {
       label: 'Basic: Cerebellum',
       positions: [],
       color: '#00A50F',
-      bias: { x: 0, y: 0 },
+      label_bias: { x: 0, y: 0 },
+      keywords_bias: {  x: -50, y: -140 },
       top_keywords:{
         "Motor  Learning": 509,
         "Cerebellum": 351,
@@ -335,8 +343,8 @@ for (const key in state.clusters) {
 // rotate_labels(state, angle);
 
 for (const key in state.clusters) {
-  state.clusters[key].x += state.clusters[key].bias.x;
-  state.clusters[key].y += state.clusters[key].bias.y;
+  state.clusters[key].x += state.clusters[key].label_bias.x;
+  state.clusters[key].y += state.clusters[key].label_bias.y;
 }
 
 try {
@@ -356,8 +364,8 @@ async function load_gexf() {
   loadingIndicator.style.margin = '10px';
   document.querySelector('.header').appendChild(loadingIndicator);
 
-  // let res = await fetch('./filtered_with_transferred_mesh.gexf');
-  let res = await fetch('./test.gexf');
+  let res = await fetch('./filtered_with_transferred_mesh.gexf');
+  // let res = await fetch('./test.gexf');
   let to_parse = await res.text();
 
   // Hide loading indicator
@@ -544,6 +552,7 @@ async function render_gexf(graph, state) {
     allowInvalidContainer: true,
   });
 
+  add_labels(renderer, state, sigma_container);
 
   // Replace live filtering with an explicit Filter button to improve performance.
   const applyFilterButtonContainer = document.createElement('div');
@@ -555,7 +564,6 @@ async function render_gexf(graph, state) {
   applyFilterButtonContainer.prepend(applyFilterButton)
   const globalFiltersEl = document.getElementById('filter-button-container') || search_container;
   globalFiltersEl.prepend(applyFilterButtonContainer);
-  add_labels(renderer, state, sigma_container);
 
   applyFilterButton.addEventListener('click', () => {
     setSearchQuery2(state, graph, renderer, search_inputs);
@@ -974,21 +982,30 @@ function parse_year(year) {
 function add_labels(renderer, state, sigma_container) {
   // create the clustersLabel layer
   const clustersLayer = document.createElement('div');
+  const keywordsLayer = document.createElement('div');
   clustersLayer.id = 'clustersLayer';
+  keywordsLayer.id = 'keywordsLayer';
   let clusterLabelsDoms = '';
+  let keywordsDoms = '';
+  // insert the layer underneath the hovers layer
+  sigma_container.insertBefore(keywordsLayer, sigma_container.querySelector('.sigma-hovers'));
   for (const key in state.clusters) {
     // for each cluster create a div label
     const cluster = state.clusters[key];
     // adapt the position to viewport coordinates
     const viewportPos = renderer.graphToViewport(cluster);
-    viewportPos.x += cluster.bias.x;
-    viewportPos.y += cluster.bias.y;
+    viewportPos.x += cluster.label_bias.x;
+    viewportPos.y += cluster.label_bias.y;
     clusterLabelsDoms += `<div id='${cluster.label}' class="clusterLabel" style="top:${viewportPos.y}px;left:${viewportPos.x}px;color:${cluster.color}">${cluster.displaylabel}</div>`;
+    keywordsDoms += `<div id='${cluster.label}_keywords' class="keywords-list" style="top:${viewportPos.y + cluster.keywords_bias.y}px;left:${viewportPos.x + cluster.keywords_bias.y}px;color:${cluster.color}">${Object.keys(cluster.top_keywords).join('\n')}</div>`;
   }
+  
+  keywordsLayer.innerHTML = keywordsDoms;
   clustersLayer.innerHTML = clusterLabelsDoms;
 
   // insert the layer underneath the hovers layer
   sigma_container.insertBefore(clustersLayer, sigma_container.querySelector('.sigma-hovers'));
+  sigma_container.insertBefore(keywordsLayer, sigma_container.querySelector('.sigma-hovers'));
 
   // Store the current checked cluster classes in state
   state.visibleClusters = new Set(Object.keys(state.clusters));
@@ -998,12 +1015,16 @@ function add_labels(renderer, state, sigma_container) {
     for (const key in state.clusters) {
       const cluster = state.clusters[key];
       const clusterLabel = document.getElementById(cluster.label);
+      const keywords = document.getElementById(`${cluster.label}_keywords`);
       if (clusterLabel) {
         // update position from the viewport
         const viewportPos = renderer.graphToViewport(cluster);
         clusterLabel.style.top = `${viewportPos.y}px`;
         clusterLabel.style.left = `${viewportPos.x}px`;
         clusterLabel.style.fontSize = `${0.7 / Math.sqrt(renderer.getCamera().ratio)}rem`;
+        keywords.style.top = `${viewportPos.y+ cluster.keywords_bias.y/ Math.sqrt(renderer.getCamera().ratio)}px`;
+        keywords.style.left = `${viewportPos.x + cluster.keywords_bias.x/ Math.sqrt(renderer.getCamera().ratio)}px`;
+        keywords.style.fontSize = `${0.25 / Math.sqrt(renderer.getCamera().ratio)}rem`;
       }
       // Only hide/show based on state.visibleClusters (updated by Filter button), not checkbox state
       if (!state.visibleClusters.has(key) || !state.showLabels) {
@@ -1021,7 +1042,7 @@ function add_labels(renderer, state, sigma_container) {
 
   const clusterLabelsSection = document.createElement('div');
   clusterLabelsSection.className = 'cluster-labels-section';
-  document.querySelector('#global-filters').prepend(clusterLabelsSection);
+  document.querySelector('#global-filters').append(clusterLabelsSection);
 
   for (const cluster in state.clusters) {
     const checkbox = document.createElement('input');
@@ -1038,6 +1059,7 @@ function add_labels(renderer, state, sigma_container) {
     clusterLabelsSection.appendChild(clusterLabelsRow);
   }
 }
+
 
 async function create_table() {
   let data_for_table = graph.toJSON().nodes.map((obj) => {
