@@ -1129,7 +1129,7 @@ function add_labels(renderer, state, sigma_container) {
         clusterLabel.style.fontSize = `${0.7 / renderer.getCamera().ratio}rem`;
         keywords.style.top = `${viewportPos.y+ cluster.keywords_bias.y/ renderer.getCamera().ratio}px`;
         keywords.style.left = `${viewportPos.x + cluster.keywords_bias.x/ renderer.getCamera().ratio}px`;
-        keywords.style.fontSize = `${0.25 / Math.sqrt(renderer.getCamera().ratio)}rem`;
+        keywords.style.fontSize = `${0.35 / Math.sqrt(renderer.getCamera().ratio)}rem`;
       }
       // Only hide/show based on state.visibleClusters (updated by Filter button), not checkbox state
       if (!state.visibleClusters.has(key) || !state.showLabels) {
