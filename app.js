@@ -31,7 +31,7 @@ document.getElementById('filter-clear').addEventListener('click', () => {
 // papersTable.setData(data_for_table);
 
 let renderer = null;
-
+console.log('starting')
 // Define state for hover interactions
 const state = {
   hoveredNode: undefined,
@@ -357,17 +357,114 @@ window.renderer = renderer;
 loadingAnimation.classList.remove('show');
 // fitViewportToNodes(renderer, graph.nodes(), { animate: true });
 
+// Initialize IndexedDB for caching large graph data
+function initIndexedDB() {
+  return new Promise((resolve, reject) => {
+    const request = indexedDB.open('CitationMapDB', 1);
+    
+    request.onerror = () => reject(request.error);
+    request.onsuccess = () => resolve(request.result);
+    
+    request.onupgradeneeded = (event) => {
+      const db = event.target.result;
+      if (!db.objectStoreNames.contains('graphs')) {
+        db.createObjectStore('graphs', { keyPath: 'id' });
+      }
+    };
+  });
+}
+
+function getCachedGraph() {
+  return new Promise(async (resolve) => {
+    try {
+      const db = await initIndexedDB();
+      const transaction = db.transaction(['graphs'], 'readonly');
+      const store = transaction.objectStore('graphs');
+      const request = store.get('main_graph');
+      
+      request.onsuccess = () => {
+        resolve(request.result?.data || null);
+      };
+      request.onerror = () => resolve(null);
+    } catch (e) {
+      console.warn('IndexedDB error:', e);
+      resolve(null);
+    }
+  });
+}
+
+function cacheGraph(graphJson) {
+  return new Promise(async (resolve) => {
+    try {
+      const db = await initIndexedDB();
+      const transaction = db.transaction(['graphs'], 'readwrite');
+      const store = transaction.objectStore('graphs');
+      store.put({ id: 'main_graph', data: graphJson });
+      
+      transaction.oncomplete = () => {
+        console.log('graph cached in IndexedDB');
+        resolve();
+      };
+      transaction.onerror = () => {
+        console.warn('Failed to cache graph');
+        resolve();
+      };
+    } catch (e) {
+      console.warn('Could not cache graph:', e);
+      resolve();
+    }
+  });
+}
+
+function clearCachedGraph() {
+  return new Promise(async (resolve) => {
+    try {
+      const db = await initIndexedDB();
+      const transaction = db.transaction(['graphs'], 'readwrite');
+      const store = transaction.objectStore('graphs');
+      store.delete('main_graph');
+      
+      transaction.oncomplete = () => resolve();
+      transaction.onerror = () => resolve();
+    } catch (e) {
+      console.warn('Could not clear cache:', e);
+      resolve();
+    }
+  });
+}
+
 async function load_gexf() {
   // Add a loading indicator
   const loadingIndicator = document.createElement('div');
   loadingIndicator.textContent = 'Loading graph...';
   loadingIndicator.style.margin = '10px';
   document.querySelector('.header').appendChild(loadingIndicator);
+  
+  let graph;
 
-  let res = await fetch('./filtered_with_transferred_mesh.gexf');
-  // let res = await fetch('./test.gexf');
-  let to_parse = await res.text();
+  // Try to load from cache first
+  const cachedGraphJson = await getCachedGraph();
+  if (cachedGraphJson) {
+    loadingIndicator.textContent = 'Loading graph from cache...';
+    console.log('loading graph from cache');
+    graph = window.graphology.from(cachedGraphJson);
+  } else {
+    // Fetch and parse from file if not in cache
+    loadingIndicator.textContent = 'Parsing graph data...';
+    console.log('fetching gexf');
+    let res = await fetch('./filtered_with_transferred_mesh.gexf');
+    let to_parse = await res.text();
+    console.log('fetched gexf');
 
+    console.log('parsing gexf');
+    graph = parse(window.graphology, to_parse, { addMissingNodes: true });
+    console.log('parsed gexf');
+    
+    // Store parsed graph in cache for next time
+    const graphJson = graph.toJSON();
+    await cacheGraph(graphJson);
+  }
+  
   // Hide loading indicator
   loadingIndicator.textContent = 'Graph loaded successfully!';
   loadingIndicator.style.color = 'green';
@@ -375,7 +472,6 @@ async function load_gexf() {
     loadingIndicator.style.display = 'none';
   }, 4000);
 
-  const graph = parse(window.graphology, to_parse, { addMissingNodes: true });
   return graph;
 }
 
@@ -629,6 +725,15 @@ async function render_gexf(graph, state) {
   helpButton.addEventListener('click', () => {
     renderHelp();
   });
+
+  // Clear cache button
+  // const clearCacheButton = document.getElementById('clear-cache-button');
+  // if (clearCacheButton) {
+  //   clearCacheButton.addEventListener('click', async () => {
+  //     await clearCachedGraph();
+  //     alert('Cache cleared! The graph will be re-parsed on your next visit.');
+  //   });
+  // }
 
   //Bind click behavior
   renderer.on('clickNode', ({ node }) => {
@@ -1021,9 +1126,9 @@ function add_labels(renderer, state, sigma_container) {
         const viewportPos = renderer.graphToViewport(cluster);
         clusterLabel.style.top = `${viewportPos.y}px`;
         clusterLabel.style.left = `${viewportPos.x}px`;
-        clusterLabel.style.fontSize = `${0.7 / Math.sqrt(renderer.getCamera().ratio)}rem`;
-        keywords.style.top = `${viewportPos.y+ cluster.keywords_bias.y/ Math.sqrt(renderer.getCamera().ratio)}px`;
-        keywords.style.left = `${viewportPos.x + cluster.keywords_bias.x/ Math.sqrt(renderer.getCamera().ratio)}px`;
+        clusterLabel.style.fontSize = `${0.7 / renderer.getCamera().ratio}rem`;
+        keywords.style.top = `${viewportPos.y+ cluster.keywords_bias.y/ renderer.getCamera().ratio}px`;
+        keywords.style.left = `${viewportPos.x + cluster.keywords_bias.x/ renderer.getCamera().ratio}px`;
         keywords.style.fontSize = `${0.25 / Math.sqrt(renderer.getCamera().ratio)}rem`;
       }
       // Only hide/show based on state.visibleClusters (updated by Filter button), not checkbox state
