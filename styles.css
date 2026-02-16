@@ -56,9 +56,12 @@ body {
 .close-button:hover {
   cursor: pointer;
   background: rgb(255, 66, 66);
-  transition: background-color 0.2s ease-in-out;
+  color: white;
 }
 .close-button {
+transition: 
+    color 0.2s ease-in-out,
+    background-color 0.2s ease-in-out;
   color: #888888;
   position: absolute;
   border-radius: 50%;
