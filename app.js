@@ -42,6 +42,7 @@ const state = {
   query_label: '',
   query_author: '',
   showLabels: true,
+  showKeywords: true,
   clusters: {
     2: {
       displaylabel: 'Basic: Adaptation',
@@ -206,7 +207,7 @@ const state = {
       positions: [],
       color: '#FC001C',
       label_bias: { x: 0, y: 0 },
-      keywords_bias: { x: 80, y: 50 },
+      keywords_bias: { x: 0, y: 150 },
       top_keywords: {
         "Motor  Learning": 423,
         "Motor Ability": 210,
@@ -630,6 +631,7 @@ async function load_gexf() {
     loadingIndicator.textContent = 'Parsing graph data...';
     console.log('fetching gexf');
     let res = await fetch('./filtered_with_transferred_mesh.gexf');
+    // let res = await fetch('./test.gexf');
     let to_parse = await res.text();
     console.log('fetched gexf');
 
@@ -883,8 +885,20 @@ async function render_gexf(graph, state) {
   } catch (error) {
     console.error('Error binding graph interactions:', error);
   }
+  const checkbox_keywords = document.getElementById('show-keywords-checkbox-input');
+  checkbox_keywords.addEventListener('change', () => {
+    if (checkbox_keywords.checked) {
+      state.showKeywords = true;
+      console.log(state.showKeywords);
+    } else {
+      state.showKeywords = false;
+      console.log(state.showKeywords);
+    }
+    renderer.refresh({
+      skipIndexation: true,
+    });
+  });
   const checkbox_labels = document.getElementById('show-labels-checkbox-input');
-  console.log(checkbox_labels);
   checkbox_labels.addEventListener('change', () => {
     if (checkbox_labels.checked) {
       state.showLabels = true;
@@ -1144,7 +1158,6 @@ function setSearchQuery2(state, graph, renderer, search_inputs, checkboxes) {
     .map((n) => ({ id: n, year: graph.getNodeAttribute(n, 'date') }))
     .filter(({ year }) => (year ? +year >= min_year_value && +year <= max_year_value : false));
   year_nodes = new Set(year_nodes.map(({ id }) => id));
-  debugger;
 
   const checkedCheckboxes = Array.from(document.querySelectorAll('input[type="checkbox"][id^="cluster"]:checked'));
   const checked_mod_classes = checkedCheckboxes.map((v) => v.id.split('-')[1]);
@@ -1316,8 +1329,16 @@ function add_labels(renderer, state, sigma_container) {
       }
       if (state.hoveredNode) {
         if (clusterLabel) clusterLabel.style.opacity = 0.5;
+        if (keywords) keywords.style.opacity = 0.5;
       } else {
         if (clusterLabel) clusterLabel.style.opacity = 1;
+        if (keywords) keywords.style.opacity = 1;
+      }
+      // 
+      if (!state.showKeywords) {
+        if (keywords) keywords.style.display = 'none';
+      } else {
+        if (keywords) keywords.style.display = 'block';
       }
     }
   });
