@@ -6,6 +6,24 @@ import { clearFilters, updateFilter } from './table.js';
 // import Sigma from 'https://cdn.skypack.dev/sigma';
 const loadingAnimation = document.getElementById('loading-animation');
 
+const versionNoticeOverlay = document.getElementById('version-notice-overlay');
+document.getElementById('version-notice-close-button').addEventListener('click', () => {
+  versionNoticeOverlay.style.display = 'none';
+});
+// The graph parse below blocks the main thread for several seconds, so clicks queue up
+// and all fire at once when it's done. Without this guard, repeated clicks open one
+// "_blank" tab each, which browsers flag as a popup-spam attempt.
+let hasNavigatedToLatestVersion = false;
+const guardAgainstQueuedClicks = (event) => {
+  if (hasNavigatedToLatestVersion) {
+    event.preventDefault();
+    return;
+  }
+  hasNavigatedToLatestVersion = true;
+};
+document.getElementById('take-me-there-button').addEventListener('click', guardAgainstQueuedClicks);
+document.getElementById('version-notice-inline-link').addEventListener('click', guardAgainstQueuedClicks);
+
 loadingAnimation.classList.add('show');
 // Load and render the GEXF file
 const graph = await load_gexf();
