@@ -11,15 +11,16 @@ document.getElementById('version-notice-close-button').addEventListener('click',
   versionNoticeOverlay.style.display = 'none';
 });
 // The graph parse below blocks the main thread for several seconds, so clicks queue up
-// and all fire at once when it's done. Without this guard, repeated clicks open one
-// "_blank" tab each, which browsers flag as a popup-spam attempt.
-let hasNavigatedToLatestVersion = false;
+// and all fire within milliseconds of each other once it's done. Debounce instead of a
+// one-time flag, so a deliberate click later (e.g. after closing the opened tab) still works.
+let lastNavigationTime = 0;
 const guardAgainstQueuedClicks = (event) => {
-  if (hasNavigatedToLatestVersion) {
+  const now = Date.now();
+  if (now - lastNavigationTime < 1000) {
     event.preventDefault();
     return;
   }
-  hasNavigatedToLatestVersion = true;
+  lastNavigationTime = now;
 };
 document.getElementById('take-me-there-button').addEventListener('click', guardAgainstQueuedClicks);
 document.getElementById('version-notice-inline-link').addEventListener('click', guardAgainstQueuedClicks);
